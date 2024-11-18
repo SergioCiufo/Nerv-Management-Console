@@ -1,0 +1,39 @@
+@charset "ISO-8859-1";
+
+@font-face{
+	font-family: 'evangelionFont';
+	src: url('fonts/mio-font.woff2') format('woff2'),
+}
+
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	margin: 0;
+	background-color: #2b2a33;
+	background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.login-container {
+	border: 1px solid black;
+	padding: 1%;
+	border-radius: 5px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #42414d;
+}
+
+p {
+	color: red;
+}
+
+h3 {
+	color: white;
+}
+
+#logo {
+            max-width: 40%;
+            height: auto; 
+}

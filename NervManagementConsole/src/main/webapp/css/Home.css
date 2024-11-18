@@ -1,0 +1,548 @@
+@charset "ISO-8859-1";
+
+body {
+	height: 100vh;
+	margin: 0;
+	background-color: #2b2a33;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+}
+
+h1 {
+	color: white;
+}
+
+h2 {
+	color: white;
+}
+
+h3 {
+	color: white;
+}
+
+h4 {
+	color: white;
+}
+
+h5 {
+	color: white;
+}
+
+h6 {
+	color: white;
+}
+
+nav {
+	height: 6%;
+}
+
+main {
+	height: 88%;
+}
+
+footer {
+	height: 4%;
+}
+
+#logoutBtn {
+	background-color: red;
+	border: #2b2a33 solid;
+	padding-top: 0.2%;
+	padding-bottom: 0.2%;
+	padding-left: 2%;
+	padding-right: 2%;
+	transition: background-color 0.3s ease;
+}
+
+#logoutBtn:hover {
+	background-color: darkred;
+	cursor: pointer;
+}
+
+
+.nameUser {
+	text-align: center;
+	align-content: center;
+	height: 10%;
+	border: #2b2a33 solid;
+	background-color: red;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.imageUserDiv {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 30%;
+	border: #2b2a33 solid;
+	background-color: red;
+	margin-left: 5%;
+	margin-right: 5%;
+	overflow: hidden;
+}
+
+#imageUser {
+	max-width: 100%;
+	max-height: 90%;
+	height: auto;
+	object-fit: cover;
+}
+
+.box {
+	text-align: center;
+	align-content: center;
+	height: 20%;
+	border: #2b2a33 solid;
+	background-color: red;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.buttonBox {
+	background-color: red;
+	border: 0;
+	height: 100%;
+	transition: background-color 0.3s ease;
+}
+
+.buttonBox:hover {
+	background-color: darkred;
+	cursor: pointer;
+}
+
+.membersBox {
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: 100%;
+	background-color: whitesmoke;
+	border: #2b2a33 solid;
+}
+
+.buttonMemberInfo {
+	padding-top: 5%;
+	padding-bottom: 5%;
+	width: 75%;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	background-color: green;
+	border: #2b2a33 solid;
+	height: auto;
+	transition: background-color 0.3s ease;
+}
+
+.buttonMemberInfo:hover {
+	background-color: rgb(0, 71, 0);
+	cursor: pointer;
+}
+
+.buttonMemberInfoMission {
+	padding-top: 5%;
+	padding-bottom: 5%;
+	width: 75%;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	background-color: #a4205e;
+	border: #2b2a33 solid;
+	height: auto;
+	transition: background-color 0.3s ease;
+}
+
+.buttonMemberInfoMission:hover {
+	background-color: #831b4c;
+	cursor: pointer;
+}
+
+
+.buttonMemberInfoTraining {
+	padding-top: 5%;
+	padding-bottom: 5%;
+	width: 75%;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	background-color: rgba(241, 163, 11, 255);
+	border: #2b2a33 solid;
+	height: auto;
+	transition: background-color 0.3s ease;
+}
+
+.buttonMemberInfoTraining:hover {
+	background-color: rgb(241, 130, 11);
+	cursor: pointer;
+}
+
+.infoBox {
+	height: 100%;
+	background-color: whitesmoke;
+	border: #2b2a33 solid;
+}
+
+.imgMember {
+	border-radius: 7%;
+	max-width: 90%;
+}
+
+.memberSpec {
+	height: 20%;
+}
+
+.buttonStatusInfo {
+	padding-top: 3%;
+	padding-bottom: 3%;
+	width: 75%;
+	background-color: green;
+	border: #2b2a33 solid;
+	height: auto;
+	transition: background-color 0.3s ease;
+}
+
+.buttonStatusInfo:hover {
+	background-color: rgb(0, 71, 0);
+	cursor: pointer;
+}
+
+.buttonStatusInfoTraining {
+	padding-top: 3%;
+	padding-bottom: 3%;
+	width: 75%;
+	background-color: rgba(241, 163, 11, 255);
+	border: #2b2a33 solid;
+	height: auto;
+	transition: background-color 0.3s ease;
+}
+
+.buttonStatusInfoTraining:hover {
+	background-color: rgb(241, 130, 11);
+	cursor: pointer;
+}
+
+.buttonStatusInfoMission {
+	padding-top: 3%;
+	padding-bottom: 3%;
+	width: 75%;
+	background-color: #a4205e;
+	border: #2b2a33 solid;
+	height: auto;
+	transition: background-color 0.3s ease;
+}
+
+.buttonStatusInfoMission:hover {
+	background-color: #831b4c;
+	cursor: pointer;
+}
+
+
+.simulationBox {
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: 100%;
+	background-color: whitesmoke;
+	border: #2b2a33 solid;
+}
+
+
+
+.buttonSimInfo {
+	padding-top: 2%;
+	padding-bottom: 2%;
+	width: 75%;
+	margin-top: 2%;
+	margin-bottom: 2%;
+	background-color: rgba(241, 163, 11, 255);
+	border: #2b2a33 solid;
+	height: auto;
+
+}
+
+.buttonSimInfo:hover {
+	background-color: rgb(241, 130, 11);
+	cursor: pointer;
+}
+
+.buttonSimCompleted {
+	display: flex;
+	padding-top: 2%;
+	padding-bottom: 2%;
+	width: 78%;
+	margin-top: 2%;
+	margin-bottom: 2%;
+	background-color: #854ddc;
+	border: #2b2a33 solid;
+	height: auto;
+
+}
+
+.buttonSimCompleted:hover {
+	background-color: green;
+	cursor: pointer;
+}
+
+.SimCompleted {
+	position: relative;
+	text-align: center;
+	transition: transform 5s ease;
+	overflow: hidden;
+}
+
+.buttonSimToStart {
+	width: 75%;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	height: auto;
+	border: none;
+}
+
+.SimDescpBtn {
+	flex: 0 0 80%;
+	position: relative;
+	padding: 10%;
+	background-color: #2b2a33;
+	text-align: center;
+	transition: transform 5s ease;
+	overflow: hidden;
+}
+
+.startSimBtn {
+	flex: 0 0 20%;
+	writing-mode: sideways-lr;
+	background-color: red;
+	border: solid 2px #2b2a33;
+}
+
+.startSimBtn:hover {
+	background-color: darkred;
+	cursor: pointer;
+}
+
+.simStatusTrue {
+	color: red;
+}
+
+.infoSimulation {
+	display: none;
+	left: 0;
+	width: 100%;
+	top: 100%;
+	opacity: 0;
+	transform: translateY(20px);
+
+}
+
+.SimDescpBtn:hover .infoSimulation {
+	display: block;
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.simMembHide {
+	height: 100%;
+}
+
+
+.imgSimMember {
+	border-radius: 7%;
+	max-width: 100%;
+	height: auto;
+}
+
+.infoSimBox {
+	height: 100%;
+	max-height: 100%;
+	overflow: auto;
+	background-color: whitesmoke;
+	border: 2px solid #2b2a33;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+.simMembCol11 {
+	width: 70%;
+}
+
+
+.radioSimMembLabel {
+	cursor: pointer;
+}
+
+.simMembCol11 {
+	display: inline-block;
+}
+
+.imgSimMember {
+	max-width: 90%;
+	height: auto;
+	border-radius: 7%;
+	transition: transform 0.3s ease;
+}
+
+
+.imgSimMember:hover {
+	transform: scale(1.05);
+}
+
+.memberStartBtn {
+	background-color: transparent;
+	border: none;
+}
+
+
+
+.formSimComp {
+	display: flex;
+	justify-content: center;
+}
+
+.buttonMissionArchive {
+	padding-top: 2%;
+	padding-bottom: 2%;
+	width: 75%;
+	margin-top: 2%;
+	margin-bottom: 2%;
+	background-color: rgb(13, 117, 203);
+	border: #2b2a33 solid;
+	height: auto;
+
+}
+
+.buttonMissionArchive:hover {
+	background-color: rgb(9, 91, 158);
+	cursor: pointer;
+}
+
+.buttonMissionToStart {
+	width: 75%;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	height: auto;
+	border: none;
+}
+
+.buttonIdMissionToStart {
+	width: 75%;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	height: auto;
+	border: none;
+}
+
+
+.table {
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.table th {
+	background-color: #007BFF;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	padding: 12px;
+}
+
+.table td {
+	padding: 12px;
+	color: #555;
+	border-top: 1px solid #ddd;
+	font-weight: 500;
+}
+
+#closeMissionArchive {
+	background-color: red;
+	color: #333;
+	cursor: pointer;
+	transition: color 0.3s;
+}
+
+#closeMissionArchive:hover {
+	color: #f00;
+}
+
+#missionArchive {
+	background-color: whitesmoke;
+}
+
+.missionArchiveBox {
+	overflow-y: auto;
+	overflow-x: hidden;
+	margin: 5%;
+	background-color: whitesmoke;
+}
+
+.missMembHide {
+	height: 100%;
+}
+
+.buttonMissionInfo {
+	padding-top: 2%;
+	padding-bottom: 2%;
+	width: 75%;
+	margin-top: 2%;
+	margin-bottom: 2%;
+	background-color: #a4205e;
+	border: #2b2a33 solid;
+	height: auto;
+}
+
+.buttonMissionInfo:hover {
+	background-color: #831b4c;
+	cursor: pointer;
+}
+
+.missDescpBtn {
+	background-color: #2b2a33;
+	text-align: center;
+	transition: transform 5s ease;
+	overflow: hidden;
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+
+.missDescpBtn img {
+	width: 100%;
+	height: auto;
+	display: block;
+	transition: opacity 0.3s ease-in-out;
+}
+
+.missDescpBtn .overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	opacity: 0;
+	transition: opacity 0.3s ease-in-out;
+}
+
+.infoMission {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	opacity: 0;
+	transition: opacity 0.3s ease-in-out;
+	text-align: center;
+	padding: 10px;
+	max-width: 90%;
+}
+
+.missDescpBtn:hover .overlay {
+	opacity: 1;
+}
+
+.missDescpBtn:hover .infoMission {
+	opacity: 1;
+}
+
+.missStatusTrue {
+	color: rgb(0, 0, 0);
+}
+
+.formMissionComp {
+	display: flex;
+	justify-content: center;
+}
