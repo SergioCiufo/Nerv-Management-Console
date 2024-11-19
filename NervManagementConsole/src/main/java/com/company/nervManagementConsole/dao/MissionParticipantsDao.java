@@ -14,21 +14,13 @@ import com.company.nervManagementConsole.model.MissionArchive;
 import com.company.nervManagementConsole.model.MissionParticipants;
 import com.company.nervManagementConsole.model.User;
 
-public class MissionParticipantsDao implements DaoInterface<MissionParticipants> {
-	private Connection connection;
+public class MissionParticipantsDao implements DaoInterface<MissionParticipants> {	
 	
-	
-	public MissionParticipantsDao(Connection connection) {
+	public MissionParticipantsDao() {
 		super();
-		this.connection = connection;
-	}
-
-
-	public void create(MissionParticipants ref) throws SQLException {
-		// TODO Auto-generated method stub		
 	}
 	
-	public void startMission(User user, Integer memberId, Integer missionId) throws SQLException {
+	public void startMission(User user, Integer memberId, Integer missionId, Connection connection) throws SQLException {
 		String sql = "INSERT INTO MEMBER_MISSION (missionId, memberId, userId)"
 				+ "VALUES (?, ?, ?)";
 		try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
@@ -38,26 +30,8 @@ public class MissionParticipantsDao implements DaoInterface<MissionParticipants>
 			preparedStatement.executeUpdate();
 		}
 	}
-
-	@Override
-	public List<MissionParticipants> retrieve() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void update(MissionParticipants ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(MissionParticipants ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
 	
-	public List<MissionParticipants> getMissionParticipantsByUserIdAndMissionId(User user, Mission mission) {
+	public List<MissionParticipants> getMissionParticipantsByUserIdAndMissionId(User user, Mission mission, Connection connection) {
 	    List<MissionParticipants> mpList = new ArrayList<>();  // Inizializzo la lista
 	    String query = "SELECT * FROM MEMBER_MISSION WHERE userId = ? AND missionId = ?";
 	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -82,7 +56,7 @@ public class MissionParticipantsDao implements DaoInterface<MissionParticipants>
 	    return mpList;
 	}
 	
-	public void removeParticipant(User user, Integer missionId) throws SQLException {
+	public void removeParticipant(User user, Integer missionId, Connection connection) throws SQLException {
 		String sql = "DELETE FROM MEMBER_MISSION WHERE userId = ? AND missionId = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setInt(1, user.getIdUser());

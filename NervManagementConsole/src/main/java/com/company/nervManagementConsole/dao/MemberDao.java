@@ -12,15 +12,13 @@ import com.company.nervManagementConsole.model.Member;
 import com.company.nervManagementConsole.model.User;
 
 public class MemberDao implements DaoInterface<Member> {
-	private Connection connection;
 
-	public MemberDao(Connection connection) {
-		this.connection=connection;
-
+	public MemberDao() {
+		super();
 	}
 
 	@Override
-	public void create(Member ref) throws SQLException {
+	public void create(Member ref, Connection connection) throws SQLException {
 		String insertSQL = "INSERT INTO members (name, surname, alias) "
 				+ "VALUES (?, ?, ?)";
 
@@ -37,7 +35,7 @@ public class MemberDao implements DaoInterface<Member> {
 	}
 
 	@Override
-	public List<Member> retrieve() throws SQLException {
+	public List<Member> retrieve(Connection connection) throws SQLException {
 		List<Member> members = new ArrayList<Member>();
 		String query ="SELECT * FROM members";
 		try (Statement statement = connection.createStatement();
@@ -60,16 +58,5 @@ public class MemberDao implements DaoInterface<Member> {
 		return members;
 	}
 
-	@Override
-	public void update(Member ref) throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void delete(Member ref) throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
 
 }

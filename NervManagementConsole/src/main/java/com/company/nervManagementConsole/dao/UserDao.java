@@ -11,14 +11,13 @@ import java.util.List;
 import com.company.nervManagementConsole.model.User;
 
 public class UserDao implements DaoInterface<User> {
-	private Connection connection;
 
-	public UserDao(Connection connection) {
-		this.connection = connection;
+	public UserDao() {
+		super();
 	}
 
 	@Override
-	public void create(User ref) throws SQLException {
+	public void create(User ref, Connection connection) throws SQLException {
 	    String insertSQL = "INSERT INTO USERS (name, surname, username, password) VALUES (?, ?, ?, ?)";
 
 	    try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
@@ -35,7 +34,7 @@ public class UserDao implements DaoInterface<User> {
 	}
 
 	@Override
-	public List<User> retrieve() throws SQLException {
+	public List<User> retrieve(Connection connection) throws SQLException {
 	    String query = "SELECT * FROM USERS";
 	    List<User> users = new ArrayList<>();
 
@@ -61,16 +60,34 @@ public class UserDao implements DaoInterface<User> {
 	    }
 		return users;
 	}
+	
+	public User getUserByUsernameAndPassword(String username, String password, Connection connection) throws SQLException {
+	    String query = "SELECT * FROM USERS WHERE username = ? AND password = ?";
+	    User user = null;
 
-	@Override
-	public void update(User ref) throws SQLException {
+	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+	        preparedStatement.setString(1, username);
+	        preparedStatement.setString(2, password);
+
+	        ResultSet rs = preparedStatement.executeQuery();
+
+	        if (rs.next()) {
+	            Integer idUser = rs.getInt("userId");
+	            String name = rs.getString("name");
+	            String surname = rs.getString("surname");
+
+	            user = new User();
+	            user.setIdUser(idUser);
+	            user.setName(name);
+	            user.setSurname(surname);
+	            user.setUsername(username);
+	            user.setPassword(password);
+	        }
+	    }
+	    return user;
 	}
 
-	@Override
-	public void delete(User ref) throws SQLException {
-	}
-
-	public User getUserByUsername(String usernamePar) throws SQLException {
+	public User getUserByUsername(String usernamePar, Connection connection) throws SQLException {
 		User user = null;
 		String query = "SELECT * FROM users WHERE username=?";
 

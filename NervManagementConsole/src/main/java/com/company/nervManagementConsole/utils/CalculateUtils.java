@@ -3,7 +3,7 @@ package com.company.nervManagementConsole.utils;
 import java.util.List;
 import java.util.Random;
 
-public class CalculateWinLoseUtils {
+public class CalculateUtils {
 
 	    public static Integer calculateAverage(List<Integer> list) {
 	        if (list.isEmpty()) {
@@ -39,4 +39,25 @@ public class CalculateWinLoseUtils {
 
 	        return result;
 	    }
+	    
+		public static Integer MinMaxStat (Integer stat) {
+			 if (stat < 0) {
+			        return 0;
+			    } else if (stat > 100) {
+			        return 100;
+			    }
+			    return stat;
+		}
+		
+		public static int randomizeStats(Integer attrbMax) {
+			Random random = new Random ();
+			int valueRandom=0;
+			if(attrbMax<0) {
+				valueRandom= random.nextInt(-attrbMax + 1) + attrbMax;
+				return valueRandom;
+			}else {
+				valueRandom= random.nextInt(attrbMax)+1;
+				return valueRandom;
+			}
+		}
 }

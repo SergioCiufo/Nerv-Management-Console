@@ -16,41 +16,15 @@ import com.company.nervManagementConsole.model.MissionArchive.MissionResult;
 import com.company.nervManagementConsole.model.User;
 
 public class MissionArchiveDao implements DaoInterface<MissionArchiveDao> {
-	private Connection connection;
 	
 	
-	public MissionArchiveDao(Connection connection) {
+	public MissionArchiveDao() {
 		super();
-		this.connection = connection;
 	}
 
-	@Override
-	public void create(MissionArchiveDao ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<MissionArchiveDao> retrieve() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void update(MissionArchiveDao ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(MissionArchiveDao ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public void addMissionArchive(User user, Integer missionId, Integer memberId, 
 	        String missionCode, Timestamp startTime, Timestamp endTime, Integer tacticalAbility, 
-	        Integer synchRate, Integer supportAbility, MissionResult result) throws SQLException {
+	        Integer synchRate, Integer supportAbility, MissionResult result, Connection connection) throws SQLException {
 	    String sql = "INSERT INTO MISSION_ARCHIVE (mission_code, missionId, userId, memberId, startTime, endTime, "
 	            + "tacticalAbility, synchRate, supportAbility, result) "
 	            + "VALUES (?,?,?,?,?,?,?,?,?,?)";
@@ -73,7 +47,7 @@ public class MissionArchiveDao implements DaoInterface<MissionArchiveDao> {
 	    }
 	}
 
-	public List<MissionArchive> retriveByUserIdAndIdMission(User user, Mission mission) throws SQLException {
+	public List<MissionArchive> retriveByUserIdAndIdMission(User user, Mission mission, Connection connection) throws SQLException {
 	    List<MissionArchive> mArchiveList = new ArrayList<>();
 	    String sql = "SELECT * FROM MISSION_ARCHIVE WHERE userId = ? AND missionId = ?";
 	    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -109,7 +83,7 @@ public class MissionArchiveDao implements DaoInterface<MissionArchiveDao> {
 	    return mArchiveList;
 	}
 	
-	public MissionArchive retriveByUserIdAndIdMissionResultProgress(User user, Mission mission) throws SQLException{
+	public MissionArchive retriveByUserIdAndIdMissionResultProgress(User user, Mission mission, Connection connection) throws SQLException{
 		MissionArchive mArchive = null;
 		String sql = "SELECT * FROM MISSION_ARCHIVE WHERE userId = ? AND missionId = ? AND result = 'PROGRESS'";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
@@ -140,7 +114,7 @@ public class MissionArchiveDao implements DaoInterface<MissionArchiveDao> {
 		 return mArchive;
 	}
 	
-	public void updateMissionResult(MissionArchive ref, MissionResult result) throws SQLException {
+	public void updateMissionResult(MissionArchive ref, MissionResult result, Connection connection) throws SQLException {
 	    String query = "UPDATE MISSION_ARCHIVE "
 	            + "SET result = ? "
 	            + "WHERE mission_code = ?";

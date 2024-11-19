@@ -12,14 +12,13 @@ import com.company.nervManagementConsole.model.UserMembersStats;
 import com.company.nervManagementConsole.model.User;
 
 public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
-	private Connection connection;
 	
-	public UserMemberStatsDao(Connection connection) {
-		this.connection = connection;
+	public UserMemberStatsDao() {
+		super();
 	}
 
 	 @Override
-	    public void create(UserMembersStats ref) throws SQLException {
+	    public void create(UserMembersStats ref, Connection connection) throws SQLException {
 	        String sql = "INSERT INTO USERMEMBERS_STATS (userId, memberId, levelPg, exp, synchronizationRate, tacticalAbility, supportAbility, status) "
 	                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	        
@@ -38,25 +37,7 @@ public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
 	        }
 	    }
 
-	@Override
-	public List<UserMembersStats> retrieve() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void update(UserMembersStats ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(UserMembersStats ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public List<UserMembersStats> getMemberStatsByUserId(User user) throws SQLException {
+	public List<UserMembersStats> getMemberStatsByUserId(User user, Connection connection) throws SQLException {
 	    String query = "SELECT statsId, userId, memberId, levelPg, synchronizationRate, tacticalAbility, supportAbility, status " +
 	                   "FROM USERMEMBERS_STATS WHERE userId = ?";
 	    List<UserMembersStats> memberStatsList = new ArrayList<>();
@@ -100,7 +81,7 @@ public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
 	     return memberStatsList;
 	 }
 	
-    public UserMembersStats retrieveByUserAndMember(User user, Member member) throws SQLException {
+    public UserMembersStats retrieveByUserAndMember(User user, Member member, Connection connection) throws SQLException {
         UserMembersStats stats = null;
         String query = "SELECT * FROM USERMEMBERS_STATS WHERE userId = ? AND memberId = ?";
         
@@ -129,7 +110,7 @@ public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
         return stats;
     }
     
-    public UserMembersStats retrieveByUserAndMemberId(User user, Integer memberId) throws SQLException {
+    public UserMembersStats retrieveByUserAndMemberId(User user, Integer memberId, Connection connection) throws SQLException {
         UserMembersStats stats = null;
         String query = "SELECT * FROM USERMEMBERS_STATS WHERE userId = ? AND memberId = ?";
         
@@ -157,7 +138,7 @@ public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
         return stats;
     }
 
-    public void updateMembStatsStartSim (User user, Integer memberId) throws SQLException {
+    public void updateMembStatsStartSim (User user, Integer memberId, Connection connection) throws SQLException {
     	String query = "UPDATE USERMEMBERS_STATS "
     			+ "SET status = ?"
     			+ "WHERE userId = ? AND memberId = ?";
@@ -171,7 +152,8 @@ public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
 		}
     }
 
-    public void updateMembStatsCompletedSim (User user, Integer memberId, Integer exp, Integer levelPg, Integer suppAbility, Integer sincRate, Integer tactAbility) throws SQLException {
+    public void updateMembStatsCompletedSim (User user, Integer memberId, Integer exp, Integer levelPg, 
+    		Integer suppAbility, Integer sincRate, Integer tactAbility, Connection connection) throws SQLException {
     	String query = "UPDATE USERMEMBERS_STATS "
     			+ "SET status = ?, exp = ?, levelPg = ?, synchronizationRate = ?, tacticalAbility = ?, supportAbility = ?"
     			+ "WHERE userId = ? AND memberId = ? ";
@@ -190,7 +172,8 @@ public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
 		}
     }
     
-    public void updateMembStatsCompletedMission (User user, Integer memberId, Integer exp, Integer levelPg, Integer suppAbility, Integer sincRate, Integer tactAbility) throws SQLException {
+    public void updateMembStatsCompletedMission (User user, Integer memberId, Integer exp, Integer levelPg, 
+    		Integer suppAbility, Integer sincRate, Integer tactAbility, Connection connection) throws SQLException {
     	String query = "UPDATE USERMEMBERS_STATS "
     			+ "SET status = ?, exp = ?, levelPg = ?, synchronizationRate = ?, tacticalAbility = ?, supportAbility = ?"
     			+ "WHERE userId = ? AND memberId = ? ";

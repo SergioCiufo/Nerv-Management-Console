@@ -10,15 +10,13 @@ import java.util.List;
 import com.company.nervManagementConsole.model.Mission;
 
 public class MissionDao implements DaoInterface<Mission> {
-	private Connection connection;
 
-	public MissionDao(Connection connection) {
+	public MissionDao() {
 		super();
-		this.connection = connection;
 	}
 	
 	@Override
-	public void create(Mission ref) throws SQLException {
+	public void create(Mission ref, Connection connection) throws SQLException {
 		String insertSQL= "INSERT INTO MISSION (name, description, participantsMax, levelMin,"
 				+ "synchronizationRate, tacticalAbility, supportAbility, exp, durationTime)"
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -39,7 +37,7 @@ public class MissionDao implements DaoInterface<Mission> {
 		}
 	}
 	@Override
-	public List<Mission> retrieve() throws SQLException {
+	public List<Mission> retrieve(Connection connection) throws SQLException {
 		List<Mission> mList = new ArrayList<Mission>();
 		String query = "SELECT * FROM MISSION ORDER BY missionId ASC";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -64,22 +62,9 @@ public class MissionDao implements DaoInterface<Mission> {
 			 e.printStackTrace();
 		}
 		return mList;
-	}
-
-	@Override
-	public void update(Mission ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(Mission ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
+	}	
 	
-	
-	public Mission getMissionById(int idMission) throws SQLException {
+	public Mission getMissionById(int idMission, Connection connection) throws SQLException {
 	    Mission mission = null;
 	    String query = "SELECT * FROM MISSION WHERE missionId = ?";
 

@@ -196,9 +196,9 @@ body {
                  }
             	
             	 String buttonClass = "buttonStatusInfo";
-                 if (status.equals("TRAINING")) {
+                 if ("TRAINING".equals(status)) {
                      buttonClass = "buttonStatusInfoTraining";  // Classe CSS per il training
-                 }else if (status.equals("MISSION")) {
+                 }else if ("MISSION".equals(status)) {
                      buttonClass = "buttonMemberInfoMission";  // Classe CSS per il training
                  }
 %>

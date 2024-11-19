@@ -13,14 +13,13 @@ import com.company.nervManagementConsole.model.Simulation;
 import com.company.nervManagementConsole.model.SimulationParticipant;
 
 public class SimulationDao implements DaoInterface<Simulation> {
-	private Connection connection;
 
-	public SimulationDao(Connection connection) {
-		this.connection = connection;
+	public SimulationDao() {
+		super();
 	}
 
 	@Override
-	public void create(Simulation ref) throws SQLException {
+	public void create(Simulation ref, Connection connection) throws SQLException {
 		  String insertSQL = "INSERT INTO simulation (name, synchronizationRate,"
 		            + " tacticalAbility, supportAbility, durationTime, exp, levelMin) "
 		            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -41,7 +40,7 @@ public class SimulationDao implements DaoInterface<Simulation> {
 	}
 
 	@Override
-	public List<Simulation> retrieve() throws SQLException {
+	public List<Simulation> retrieve(Connection connection) throws SQLException {
 	    List<Simulation> simulations = new ArrayList<>();
 	    String query = "SELECT * FROM simulation";
 	    try (PreparedStatement statement = connection.prepareStatement(query);
@@ -68,20 +67,8 @@ public class SimulationDao implements DaoInterface<Simulation> {
 	    }
 	    return simulations;
 	}
-
-	@Override
-	public void update(Simulation ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(Simulation ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
 	
-	public Simulation getSimulationById(int simulationId) throws SQLException {
+	public Simulation getSimulationById(int simulationId, Connection connection) throws SQLException {
 	    String simulationQuery = "SELECT * FROM SIMULATION WHERE simulationId = ?";
 	    String participantsQuery = "SELECT sp.*, u.userId, sp.memberId FROM SIMULATION_PARTICIPANTS sp "
                 + "JOIN USERS u ON sp.userId = u.userId "
@@ -138,7 +125,7 @@ public class SimulationDao implements DaoInterface<Simulation> {
 	
 	
 	
-	public List<Simulation> getSimulationAndParticipantsByUserId(int userId) throws SQLException {
+	public List<Simulation> getSimulationAndParticipantsByUserId(int userId, Connection connection) throws SQLException {
 	    String simulationQuery = "SELECT s.* FROM SIMULATION s "
 	                             + "JOIN SIMULATION_PARTICIPANTS sp ON s.simulationId = sp.simulationId "
 	                             + "WHERE sp.userId = ?";

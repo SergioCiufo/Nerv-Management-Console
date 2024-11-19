@@ -9,19 +9,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.company.nervManagementConsole.model.User;
-import com.company.nervManagementConsole.service.Service;
+import com.company.nervManagementConsole.service.MissionService;
 import com.company.nervManagementConsole.utils.Costants;
 
 @WebServlet("/missionCompleted")
 public class MissionCompletedServlet extends HttpServlet {
+	
+	private final MissionService missionService = new MissionService();
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
 		try {
-			Service service = (Service)getServletContext().getAttribute(Costants.KEY_SERVICE);
 			User user=(User)req.getSession().getAttribute(Costants.KEY_SESSION_USER);
 			String idMissionString = req.getParameter("missionId");
 			
-			user=service.completeMission(user, idMissionString);
+			user=missionService.completeMission(user, idMissionString);
 			
 			req.getSession().setAttribute(Costants.KEY_SESSION_USER, user);
 			resp.sendRedirect(req.getContextPath() + "/jsp/private/Home.jsp");

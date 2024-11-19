@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseTable {
-	public void createUsersTable(Connection connection) {
+	public static void createUsersTable(Connection connection) {
 	    String checkTableSQL = "SELECT COUNT(*) FROM user_tables WHERE table_name = 'USERS'";
 	    
 	    try (Statement statement = connection.createStatement();
@@ -30,7 +30,7 @@ public class DatabaseTable {
 	    }
 	}
 
-	public void createMembersTable(Connection connection) {
+	public static void createMembersTable(Connection connection) {
 	    String checkTableSQL = "SELECT COUNT(*) FROM user_tables WHERE table_name = 'MEMBERS'";
 	    
 	    try (Statement statement = connection.createStatement();
@@ -55,7 +55,7 @@ public class DatabaseTable {
 	    }
 	}
 	
-	public void createUserMembersStats(Connection connection) {
+	public static void createUserMembersStats(Connection connection) {
 	    String checkTableSQL = "SELECT COUNT(*) FROM user_tables WHERE table_name = 'USERMEMBERS_STATS'";
 	    
 	    try (Statement statement = connection.createStatement();
@@ -86,7 +86,7 @@ public class DatabaseTable {
 	    }
 	}
 	
-	public void createSimulationTable(Connection connection) {
+	public static void createSimulationTable(Connection connection) {
 		String checkTableSQL = "SELECT COUNT(*) FROM user_tables WHERE table_name = 'SIMULATION'";
 		
 		try (Statement statement = connection.createStatement();
@@ -114,7 +114,7 @@ public class DatabaseTable {
 		    }
 	}
 	
-	public void createSimulationParticipantsTable(Connection connection) {
+	public static void createSimulationParticipantsTable(Connection connection) {
 		String checkTableSQL = "SELECT COUNT(*) FROM  user_tables WHERE table_name = 'SIMULATION_PARTICIPANTS'";
 		
 		try (Statement statement = connection.createStatement(); 
@@ -145,7 +145,7 @@ public class DatabaseTable {
 	
 	
 	
-	public void createMissionTable(Connection connection) {
+	public static void createMissionTable(Connection connection) {
 		String checkTableSQL = "SELECT COUNT(*) FROM user_tables WHERE table_name = 'MISSION'";
 		
 		try (Statement statement = connection.createStatement();
@@ -176,7 +176,7 @@ public class DatabaseTable {
 		    }
 	}
 	
-	public void createMissionArchive(Connection connection) {
+	public static void createMissionArchive(Connection connection) {
 		String checkTableSQL = "SELECT COUNT(*) FROM user_tables WHERE table_name = 'MISSION_ARCHIVE'";
 		try (Statement statement = connection.createStatement();
 		         ResultSet resultSet = statement.executeQuery(checkTableSQL)) {
@@ -209,7 +209,7 @@ public class DatabaseTable {
 		    }
 	}
 	
-	public void createMemberMissionTable(Connection connection) {
+	public static void createMemberMissionTable(Connection connection) {
 	    String checkTableSQL = "SELECT COUNT(*) FROM user_tables WHERE table_name = 'MEMBER_MISSION'";
 	    
 	    try (Statement statement = connection.createStatement();

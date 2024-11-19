@@ -8,12 +8,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.company.nervManagementConsole.model.User;
-import com.company.nervManagementConsole.service.Service;
 import com.company.nervManagementConsole.utils.Costants;
 
 @WebFilter("/jsp/private/*")

@@ -29,7 +29,7 @@ public class DatabaseConfig {
         } catch (SQLException e) {
             System.out.println("Error database connection: " + e.getMessage());
             throw e;
-        }
+        } 
         return connection;
     }
 }

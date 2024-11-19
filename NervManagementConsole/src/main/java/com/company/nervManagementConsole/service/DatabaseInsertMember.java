@@ -8,18 +8,16 @@ import com.company.nervManagementConsole.model.Member;
 
 public class DatabaseInsertMember {
 		private MemberDao memberDao;
-		private Connection connection;
 		
-		public DatabaseInsertMember(MemberDao memberDao, Connection connection) {
+		public DatabaseInsertMember(MemberDao memberDao) {
 			super();
 			this.memberDao = memberDao;
-			this.connection = connection;
 		}
 		
-		private void createMember(String name, String surname, String alias) throws SQLException {
+		private void createMember(String name, String surname, String alias, Connection connection) throws SQLException {
 			Member member = new Member(null, name, surname, alias);
 				try {
-					memberDao.create(member);
+					memberDao.create(member, connection);
 					connection.commit();
 				} catch (Exception e) {
 					connection.rollback();
@@ -27,9 +25,9 @@ public class DatabaseInsertMember {
 				}
 		}
 		
-		public void createMembers() throws SQLException {
-	        createMember("Rei", "Ayanami", "First Child");
-	        createMember("Asuka", "Soryu Langley", "Second Child");
-	        createMember("Shinji", "Ikari", "Third Children");
+		public void createMembers(Connection connection) throws SQLException {
+	        createMember("Rei", "Ayanami", "First Child", connection);
+	        createMember("Asuka", "Soryu Langley", "Second Child", connection);
+	        createMember("Shinji", "Ikari", "Third Children", connection);
 	    }
 }

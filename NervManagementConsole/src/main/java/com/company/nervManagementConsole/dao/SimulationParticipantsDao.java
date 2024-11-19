@@ -15,15 +15,13 @@ import com.company.nervManagementConsole.model.SimulationParticipant;
 import com.company.nervManagementConsole.model.User;
 
 public class SimulationParticipantsDao implements DaoInterface<SimulationParticipant> {
-	private Connection connection;
 
-	public SimulationParticipantsDao(Connection connection) {
+	public SimulationParticipantsDao() {
 		super();
-		this.connection = connection;
 	}
 
 	@Override
-	public void create(SimulationParticipant ref) throws SQLException {
+	public void create(SimulationParticipant ref, Connection connection) throws SQLException {
         String sql = "INSERT INTO SIMULATION_PARTICIPANTS (simulationId, userId, memberId) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
         	preparedStatement.setInt(1, ref.getSimulationParticipantId());
@@ -32,25 +30,9 @@ public class SimulationParticipantsDao implements DaoInterface<SimulationPartici
         	preparedStatement.executeUpdate();
         }
     }
-	@Override
-	public void update(SimulationParticipant ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delete(SimulationParticipant ref) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<SimulationParticipant> retrieve() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
-	public void createParticipant(User user, Integer memberId, Integer simulationId, Timestamp startTimestamp, Timestamp endTimestamp) throws SQLException {
+	public void createParticipant(User user, Integer memberId, Integer simulationId, Timestamp startTimestamp, 
+			Timestamp endTimestamp, Connection connection) throws SQLException {
         String sql = "INSERT INTO SIMULATION_PARTICIPANTS (simulationId, userId, memberId, startTime, endTime) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
         	preparedStatement.setInt(1, simulationId);
@@ -62,7 +44,7 @@ public class SimulationParticipantsDao implements DaoInterface<SimulationPartici
         }
     }
 	
-	public List<SimulationParticipant> retriveByUserId(User user) throws SQLException{
+	public List<SimulationParticipant> retriveByUserId(User user, Connection connection) throws SQLException{
 		List<SimulationParticipant> spList= new ArrayList<SimulationParticipant>();
 		String sql = "SELECT * FROM SIMULATION_PARTICIPANTS WHERE userId= ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
@@ -86,7 +68,7 @@ public class SimulationParticipantsDao implements DaoInterface<SimulationPartici
 		return spList;
 	}
 	
-	public SimulationParticipant getParticipantbyUserAndMemberId(User user, Integer memberId) throws SQLException {
+	public SimulationParticipant getParticipantbyUserAndMemberId(User user, Integer memberId, Connection connection) throws SQLException {
 		SimulationParticipant sp = null;
 		String sql ="SELECT * FROM SIMULATION_PARTICIPANTS WHERE userId = ? AND memberId = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
@@ -108,7 +90,7 @@ public class SimulationParticipantsDao implements DaoInterface<SimulationPartici
 	    return sp;
 	}
 	
-	public void removeParticipant(User user, Integer simulationId) throws SQLException {
+	public void removeParticipant(User user, Integer simulationId, Connection connection) throws SQLException {
 		String sql ="DELETE FROM SIMULATION_PARTICIPANTS WHERE userId = ? AND simulationId = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setInt(1, user.getIdUser());
