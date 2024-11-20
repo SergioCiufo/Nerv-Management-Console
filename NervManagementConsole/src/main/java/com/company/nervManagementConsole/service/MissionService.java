@@ -15,10 +15,10 @@ import com.company.nervManagementConsole.dao.UserMemberStatsDao;
 import com.company.nervManagementConsole.model.Member;
 import com.company.nervManagementConsole.model.Mission;
 import com.company.nervManagementConsole.model.MissionArchive;
+import com.company.nervManagementConsole.model.MissionArchive.MissionResult;
 import com.company.nervManagementConsole.model.MissionParticipants;
 import com.company.nervManagementConsole.model.User;
 import com.company.nervManagementConsole.model.UserMembersStats;
-import com.company.nervManagementConsole.model.MissionArchive.MissionResult;
 import com.company.nervManagementConsole.utils.CalculateUtils;
 import com.company.nervManagementConsole.utils.LevelUpUtils;
 import com.company.nervManagementConsole.utils.MissionCodeGeneratorUtils;
@@ -68,8 +68,7 @@ public class MissionService {
 			List<MissionArchive> missionArch = missionArchiveDao.retriveByUserIdAndIdMission(user, mission, connection);
 			String missionCode = MissionCodeGeneratorUtils.missionCodeGenerator(missionArch, idMission);
 
-			MissionArchive missionArchive = missionArchiveDao.retriveByUserIdAndIdMissionResultProgress(user, mission, connection);
-			System.out.println("Mission Archive : "+ missionArchive);
+			//MissionArchive missionArchive = missionArchiveDao.retriveByUserIdAndIdMissionResultProgress(user, mission, connection);
 			for (Member memb : user.getMembers()) {
 				memb.setMemberStats(userMemberStatsDao.retrieveByUserAndMemberId(user, memb.getIdMember(), connection));
 

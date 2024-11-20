@@ -8,11 +8,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.company.nervManagementConsole.model.Member;
-import com.company.nervManagementConsole.model.User;
+import com.company.nervManagementConsole.service.RegisterService;
 
 public class MemberDao implements DaoInterface<Member> {
-
+	private static final Logger logger = LoggerFactory.getLogger(MemberDao.class);
+	
 	public MemberDao() {
 		super();
 	}
@@ -28,7 +32,7 @@ public class MemberDao implements DaoInterface<Member> {
 			preparedStatement.setString(3, ref.getAlias());
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
-			System.err.println("Error adding member: " + e.getMessage());
+			logger.error("Error adding member: " + e.getMessage());
 			throw e;
 		}
 
@@ -49,10 +53,10 @@ public class MemberDao implements DaoInterface<Member> {
 				members.add(member);
 			}
 		} catch (SQLException e) {
-			System.err.println("Error retrieving members: " + e.getMessage());
+			logger.error("Error retrieving members: " + e.getMessage());
 			throw e;
 		} catch (Exception e) {
-			System.err.println("Unexpected error: " + e.getMessage());
+			logger.error("Unexpected error: " + e.getMessage());
 			throw new RuntimeException("Unexpected error during retrieval", e);
 		}
 		return members;

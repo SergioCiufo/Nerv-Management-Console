@@ -9,11 +9,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.company.nervManagementConsole.model.Simulation;
 import com.company.nervManagementConsole.model.SimulationParticipant;
 
 public class SimulationDao implements DaoInterface<Simulation> {
-
+	private static final Logger logger = LoggerFactory.getLogger(SimulationDao.class);
+	
 	public SimulationDao() {
 		super();
 	}
@@ -32,9 +36,7 @@ public class SimulationDao implements DaoInterface<Simulation> {
 			preparedStatement.setInt(6, ref.getExp());
 			preparedStatement.setInt(7, ref.getLevel());
 			preparedStatement.executeUpdate();
-			System.out.println("Simulation successfully added");
 		} catch (SQLException e) {
-            System.err.println("Error adding Simulation: " + e.getMessage());
             throw e;
 		}
 	}
@@ -62,7 +64,7 @@ public class SimulationDao implements DaoInterface<Simulation> {
 	            simulations.add(simulation);
 	        }
 	    } catch (SQLException e) {
-	        System.err.println("Error retrieving simulations: " + e.getMessage());
+	        logger.error("Error retrieving simulations: " + e.getMessage());
 	        throw e;
 	    }
 	    return simulations;

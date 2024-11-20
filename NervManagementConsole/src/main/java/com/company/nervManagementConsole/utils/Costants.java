@@ -1,7 +1,6 @@
 package com.company.nervManagementConsole.utils;
 
 public interface Costants {
-	public final static String KEY_SERVICE = "service";
 
 	public final static String KEY_SESSION_USER="userSession";
 	

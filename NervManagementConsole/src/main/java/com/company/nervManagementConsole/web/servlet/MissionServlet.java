@@ -1,7 +1,6 @@
 package com.company.nervManagementConsole.web.servlet;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -11,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.company.nervManagementConsole.config.DatabaseConfig;
 import com.company.nervManagementConsole.model.User;
 import com.company.nervManagementConsole.service.MissionService;
 import com.company.nervManagementConsole.utils.Costants;

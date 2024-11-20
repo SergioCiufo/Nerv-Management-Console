@@ -1,6 +1,5 @@
 package com.company.nervManagementConsole.model;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class MissionParticipants {

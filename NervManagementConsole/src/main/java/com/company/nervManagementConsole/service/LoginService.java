@@ -3,7 +3,6 @@ package com.company.nervManagementConsole.service;
 import java.sql.Connection;
 
 import com.company.nervManagementConsole.config.DatabaseConfig;
-import com.company.nervManagementConsole.config.DatabaseTable;
 import com.company.nervManagementConsole.dao.UserDao;
 import com.company.nervManagementConsole.exception.InvalidCredentialsException;
 import com.company.nervManagementConsole.model.User;

@@ -5,7 +5,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.company.nervManagementConsole.service.RegisterService;
+
 public class DatabaseTable {
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseTable.class);
+	
 	public static void createUsersTable(Connection connection) {
 	    String checkTableSQL = "SELECT COUNT(*) FROM user_tables WHERE table_name = 'USERS'";
 	    
@@ -21,9 +28,10 @@ public class DatabaseTable {
 	                    + "password VARCHAR2(50) NOT NULL)";
 
 	            statement.executeUpdate(sql);
-	            System.out.println("Table USERS created successfully!");
+	            logger.info("Table USERS created successfully!");
 	        } else {
-	            System.out.println("The USERS table already exists.");
+	            logger.info("The USERS table already exists.");
+	            
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -46,9 +54,9 @@ public class DatabaseTable {
 	        			+ ")";
 
 	            statement.executeUpdate(sql);
-	            System.out.println("Table MEMBERS created successfully!");
+	            logger.info("Table MEMBERS created successfully!");
 	        } else {
-	            System.out.println("The MEMBERS table already exists.");
+	            logger.info("The MEMBERS table already exists.");
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -77,9 +85,9 @@ public class DatabaseTable {
 	                    + ")";
 
 	            statement.executeUpdate(sql);
-	            System.out.println("Table USERMEMBERS_STATS created successfully!");
+	            logger.info("Table USERMEMBERS_STATS created successfully!");
 	        } else {
-	            System.out.println("The USERMEMBERS_STATS table already exists.");
+	            logger.info("The USERMEMBERS_STATS table already exists.");
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -105,9 +113,9 @@ public class DatabaseTable {
 		        			+ ")";
 
 		            statement.executeUpdate(sql);
-		            System.out.println("Table SIMULATION created successfully!");
+		            logger.info("Table SIMULATION created successfully!");
 		        } else {
-		            System.out.println("The SIMULATION table already exists.");
+		        	logger.info("The SIMULATION table already exists.");
 		        }
 		    } catch (SQLException e) {
 		        e.printStackTrace();
@@ -134,9 +142,9 @@ public class DatabaseTable {
 	                    + "CONSTRAINT fk_member_participant FOREIGN KEY (memberId) REFERENCES MEMBERS(memberId) ON DELETE CASCADE"
 	                    + ")";
 				statement.executeUpdate(sql);
-	            System.out.println("Table SIMULATION_PARTICIPANTS created successfully!");
+	            logger.info("Table SIMULATION_PARTICIPANTS created successfully!");
 	        } else {
-	            System.out.println("The SIMULATION_PARTICIPANTS table already exists.");
+	        	logger.info("The SIMULATION_PARTICIPANTS table already exists.");
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -167,9 +175,9 @@ public class DatabaseTable {
 		        			+ ")";
 
 		            statement.executeUpdate(sql);
-		            System.out.println("Table MISSION created successfully!");
+		            logger.info("Table MISSION created successfully!");
 		        } else {
-		            System.out.println("The MISSION table already exists.");
+		        	logger.info("The MISSION table already exists.");
 		        }
 		    } catch (SQLException e) {
 		        e.printStackTrace();
@@ -200,9 +208,9 @@ public class DatabaseTable {
 		                    + ")";
 
 		            statement.executeUpdate(sql);
-		            System.out.println("Table MISSION_ARCHIVE created successfully!");
+		            logger.info("Table MISSION_ARCHIVE created successfully!");
 		        } else {
-		            System.out.println("The MISSION_ARCHIVE table already exists.");
+		        	logger.info("The MISSION_ARCHIVE table already exists.");
 		        }
 		    } catch (SQLException e) {
 		        e.printStackTrace();
@@ -227,9 +235,9 @@ public class DatabaseTable {
 	                    + ")";
 
 	            statement.executeUpdate(sql);
-	            System.out.println("Table MEMBER_MISSION created successfully!");
+	            logger.info("Table MEMBER_MISSION created successfully!");
 	        } else {
-	            System.out.println("The MEMBER_MISSION table already exists.");
+	        	logger.info("The MEMBER_MISSION table already exists.");
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();

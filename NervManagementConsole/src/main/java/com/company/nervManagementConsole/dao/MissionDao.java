@@ -7,10 +7,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.company.nervManagementConsole.model.Mission;
 
 public class MissionDao implements DaoInterface<Mission> {
-
+	private static final Logger logger = LoggerFactory.getLogger(MissionDao.class);
 	public MissionDao() {
 		super();
 	}
@@ -32,7 +35,7 @@ public class MissionDao implements DaoInterface<Mission> {
 			preparedStatement.setInt(9, ref.getDurationTime());
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
-            System.err.println("Error adding Mission: " + e.getMessage());
+            logger.error("Error adding Mission: " + e.getMessage());
             throw e;
 		}
 	}

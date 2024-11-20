@@ -93,8 +93,6 @@ public class SimulationService {
 				simulationParticipantsDao.removeParticipant(user, idSimulation, connection);
 
 				connection.commit();
-			}else {
-				System.out.println("nice try");
 			}
 			user=ris.retriveUserInformation(user, connection);
 			return user;

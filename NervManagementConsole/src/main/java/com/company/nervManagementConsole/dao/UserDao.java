@@ -4,14 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.company.nervManagementConsole.model.User;
 
 public class UserDao implements DaoInterface<User> {
-
+	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+	
 	public UserDao() {
 		super();
 	}
@@ -25,10 +28,9 @@ public class UserDao implements DaoInterface<User> {
 	        preparedStatement.setString(2, ref.getSurname());
 	        preparedStatement.setString(3, ref.getUsername());
 	        preparedStatement.setString(4, ref.getPassword());
-	        preparedStatement.executeUpdate();
-	        System.out.println("NERV user successfully added");
+	        preparedStatement.executeUpdate(); 
 	    } catch (SQLException e) {
-	        System.err.println("Error adding user: " + e.getMessage());
+	        logger.error("Error adding user: " + e.getMessage());
 	        throw e;
 	    }
 	}
@@ -105,10 +107,9 @@ public class UserDao implements DaoInterface<User> {
 		            }
 		        }
 		    } catch (SQLException e) {
-		        System.err.println("Error retrieving user: " + e.getMessage());
+		        logger.error("Error retrieving user: " + e.getMessage());
 		        throw e;
 		    } catch (Exception e) {
-		        System.err.println("Unexpected error: " + e.getMessage());
 		        throw new RuntimeException("Unexpected error during retrieval", e);
 		    }
 		    return user;

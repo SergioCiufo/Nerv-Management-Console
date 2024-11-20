@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.company.nervManagementConsole.model.Member;
-import com.company.nervManagementConsole.model.UserMembersStats;
 import com.company.nervManagementConsole.model.User;
+import com.company.nervManagementConsole.model.UserMembersStats;
 
 public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
 	
@@ -33,7 +33,6 @@ public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
 	            statement.setBoolean(8, ref.getStatus());
 	            
 	            statement.executeUpdate();
-	            System.out.println("MemberStats record created successfully!");
 	        }
 	    }
 

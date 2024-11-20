@@ -9,18 +9,13 @@ import javax.servlet.http.HttpServlet;
 import com.company.nervManagementConsole.config.DatabaseConfig;
 import com.company.nervManagementConsole.config.DatabaseTable;
 import com.company.nervManagementConsole.dao.MemberDao;
-import com.company.nervManagementConsole.dao.MissionArchiveDao;
 import com.company.nervManagementConsole.dao.MissionDao;
-import com.company.nervManagementConsole.dao.MissionParticipantsDao;
-import com.company.nervManagementConsole.dao.UserMemberStatsDao;
 import com.company.nervManagementConsole.dao.SimulationDao;
-import com.company.nervManagementConsole.dao.SimulationParticipantsDao;
-import com.company.nervManagementConsole.dao.UserDao;
 import com.company.nervManagementConsole.service.DatabaseInsertMember;
 import com.company.nervManagementConsole.service.DatabaseInsertMission;
 import com.company.nervManagementConsole.service.DatabaseInsertSimulation;
-import com.company.nervManagementConsole.utils.Costants;
-
+//NON SI FA, SI FA UN BACKUP DEL DB E LO SI PASSA MA INIT MAI PIU' //MAI PIU
+//CI SIAMO CAPITI SERGIO? MAI PIU
 @WebServlet(value = "/init", loadOnStartup = 1)
 public class Init extends HttpServlet {
     private static Connection connection;
@@ -30,7 +25,8 @@ public class Init extends HttpServlet {
     private SimulationDao simulationDao;
    
     private MissionDao missionDao;
-    
+  //NON SI FA, SI FA UN BACKUP DEL DB E LO SI PASSA MA INIT MAI PIU' //MAI PIU
+  //CI SIAMO CAPITI SERGIO? MAI PIU   
     
 
     @Override
