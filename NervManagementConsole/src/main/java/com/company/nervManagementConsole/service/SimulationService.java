@@ -1,8 +1,6 @@
 package com.company.nervManagementConsole.service;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import org.hibernate.Session;
@@ -50,10 +48,6 @@ public class SimulationService {
 			int duration = simulation.getDurationTime();
 
 			LocalDateTime endTime = startTime.plusMinutes(duration);
-
-			//conversione per tipo nel db
-			Timestamp startTimestamp = Timestamp.valueOf(startTime);
-			Timestamp endTimestamp = Timestamp.valueOf(endTime);
 			
 			userMemberStatsDao.updateMembStatsStartSim(user, member, session);
 			SimulationParticipant simParticipant = new SimulationParticipant(simulation, user, member, startTime, endTime);
