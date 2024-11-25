@@ -1,12 +1,11 @@
 package com.company.nervManagementConsole.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,80 +17,27 @@ public class MissionDao implements DaoInterface<Mission> {
 		super();
 	}
 	
-	@Override
-	public void create(Mission ref, Connection connection) throws SQLException {
-		String insertSQL= "INSERT INTO MISSION (name, description, participantsMax, levelMin,"
-				+ "synchronizationRate, tacticalAbility, supportAbility, exp, durationTime)"
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-			preparedStatement.setString(1, ref.getName());
-			preparedStatement.setString(2, ref.getDescription());
-			preparedStatement.setInt(3, ref.getParticipantsMax());
-			preparedStatement.setInt(4, ref.getLevel());
-			preparedStatement.setInt(5, ref.getSynchronizationRate());
-			preparedStatement.setInt(6, ref.getTacticalAbility());
-			preparedStatement.setInt(7, ref.getSupportAbility());
-			preparedStatement.setInt(8, ref.getExp());
-			preparedStatement.setInt(9, ref.getDurationTime());
-			preparedStatement.executeUpdate();
-		} catch (SQLException e) {
-            logger.error("Error adding Mission: " + e.getMessage());
-            throw e;
-		}
+	public List<Mission> retrieve(Session session) {
+	    String hql = "FROM Mission ORDER BY missionId ASC";
+	    Query<Mission> query = session.createQuery(hql, Mission.class);
+	    return query.list();
 	}
-	@Override
-	public List<Mission> retrieve(Connection connection) throws SQLException {
-		List<Mission> mList = new ArrayList<Mission>();
-		String query = "SELECT * FROM MISSION ORDER BY missionId ASC";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(query);
-		         ResultSet resultSet = preparedStatement.executeQuery()) {
-			while(resultSet.next()) {
-				Mission mission = new Mission (
-						resultSet.getInt("exp"),
-	                    resultSet.getInt("levelMin"),
-	                    resultSet.getInt("synchronizationRate"),
-	                    resultSet.getInt("tacticalAbility"),
-	                    resultSet.getInt("supportAbility"),
-	                    resultSet.getString("name"),
-	                    resultSet.getInt("durationTime"),
-	                    resultSet.getInt("missionId"),
-	                    resultSet.getString("description"),
-	                    resultSet.getBlob("imageMission"),
-	                    resultSet.getInt("participantsMax")
-	                );
-				mList.add(mission);
-			}
-		} catch (Exception e) {
-			 e.printStackTrace();
-		}
-		return mList;
-	}	
 	
-	public Mission getMissionById(int idMission, Connection connection) throws SQLException {
+	public Mission getMissionById(int idMission, Session session) throws SQLException {
 	    Mission mission = null;
-	    String query = "SELECT * FROM MISSION WHERE missionId = ?";
+	    try {
+	        String hql = "FROM Mission m WHERE m.missionId = :missionId";
+	        
+	        Query<Mission> query = session.createQuery(hql, Mission.class);
+	        query.setParameter("missionId", idMission);
 
-	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-	        preparedStatement.setInt(1, idMission);
+	        mission = query.uniqueResult();
 
-	        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-	            if (resultSet.next()) {
-	                mission = new Mission(
-	                    resultSet.getInt("exp"),
-	                    resultSet.getInt("levelMin"),
-	                    resultSet.getInt("synchronizationRate"),
-	                    resultSet.getInt("tacticalAbility"),
-	                    resultSet.getInt("supportAbility"),
-	                    resultSet.getString("name"),
-	                    resultSet.getInt("durationTime"),
-	                    resultSet.getInt("missionId"),
-	                    resultSet.getString("description"),
-	                    resultSet.getInt("participantsMax")
-	                );
-	            }
-	        }
+	    } catch (HibernateException e) {
+	        logger.error("Error retrieving mission with id: " + idMission, e);
+	        throw new SQLException("Error retrieving mission", e);
 	    }
+
 	    return mission;
 	}
-
 }

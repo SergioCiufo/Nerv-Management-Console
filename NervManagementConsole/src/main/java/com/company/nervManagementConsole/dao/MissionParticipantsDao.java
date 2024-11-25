@@ -1,65 +1,58 @@
 package com.company.nervManagementConsole.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.company.nervManagementConsole.model.Mission;
 import com.company.nervManagementConsole.model.MissionParticipants;
 import com.company.nervManagementConsole.model.User;
 
 public class MissionParticipantsDao implements DaoInterface<MissionParticipants> {	
+	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 	
 	public MissionParticipantsDao() {
 		super();
 	}
-	
-	public void startMission(User user, Integer memberId, Integer missionId, Connection connection) throws SQLException {
-		String sql = "INSERT INTO MEMBER_MISSION (missionId, memberId, userId)"
-				+ "VALUES (?, ?, ?)";
-		try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-			preparedStatement.setInt(1, missionId);
-			preparedStatement.setInt(2, memberId);
-			preparedStatement.setInt(3, user.getIdUser());
-			preparedStatement.executeUpdate();
-		}
-	}
-	
-	public List<MissionParticipants> getMissionParticipantsByUserIdAndMissionId(User user, Mission mission, Connection connection) {
-	    List<MissionParticipants> mpList = new ArrayList<>();  // Inizializzo la lista
-	    String query = "SELECT * FROM MEMBER_MISSION WHERE userId = ? AND missionId = ?";
-	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-	        preparedStatement.setInt(1, user.getIdUser());
-	        preparedStatement.setInt(2, mission.getMissionId());
 
-	        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-	            while (resultSet.next()) {
-	                MissionParticipants mp = new MissionParticipants(
-	                        resultSet.getInt("missionParticipantsId"),
-	                        mission,
-	                        user.getIdUser(),
-	                        resultSet.getInt("memberId")
-	                );
-	                mpList.add(mp);
-	            }
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
+	public void startMission(MissionParticipants ref, Session session) {
+		try {
+	        session.save(ref);
+	    } catch (HibernateException e) {
+	        logger.error("Error adding missionParticipant: " + ref + e.getMessage());
+	        throw e;
 	    }
-
-	    return mpList;
 	}
 	
-	public void removeParticipant(User user, Integer missionId, Connection connection) throws SQLException {
-		String sql = "DELETE FROM MEMBER_MISSION WHERE userId = ? AND missionId = ?";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			preparedStatement.setInt(1, user.getIdUser());
-			preparedStatement.setInt(2, missionId);
-			preparedStatement.executeUpdate();
-		} 
-	}
+	public List<MissionParticipants> getMissionParticipantsByUserIdAndMissionId(User user, Mission mission, Session session) {
+	    String hql = "FROM MissionParticipants mp " +
+	                 "WHERE mp.user.id = :userId AND mp.mission.missionId = :missionId";
 
+	    Query<MissionParticipants> query = session.createQuery(hql, MissionParticipants.class);
+	    query.setParameter("userId", user.getIdUser());
+	    query.setParameter("missionId", mission.getMissionId());
+
+	    return query.getResultList();
+	}
+	
+	public void removeParticipant(User user, Mission mission, Session session) throws SQLException {
+	    try {
+	        String hql = "DELETE FROM MissionParticipants mp " +
+	                     "WHERE mp.user.id = :userId AND mp.mission.id = :missionId";
+
+	        Query<?> query = session.createQuery(hql);
+	        query.setParameter("userId", user.getIdUser());
+	        query.setParameter("missionId", mission.getMissionId());
+	        
+	        query.executeUpdate();
+	    } catch (HibernateException e) {
+	        logger.error("Error removing participant for userId: " + user.getIdUser() + " missionId: " + mission.getMissionId(), e);
+	        throw new SQLException("Error removing participant", e);
+	    }
+	}
 }

@@ -1,19 +1,18 @@
 package com.company.nervManagementConsole.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.company.nervManagementConsole.model.Simulation;
 import com.company.nervManagementConsole.model.SimulationParticipant;
+import com.company.nervManagementConsole.model.User;
 
 public class SimulationDao implements DaoInterface<Simulation> {
 	private static final Logger logger = LoggerFactory.getLogger(SimulationDao.class);
@@ -22,164 +21,59 @@ public class SimulationDao implements DaoInterface<Simulation> {
 		super();
 	}
 
-	@Override
-	public void create(Simulation ref, Connection connection) throws SQLException {
-		  String insertSQL = "INSERT INTO simulation (name, synchronizationRate,"
-		            + " tacticalAbility, supportAbility, durationTime, exp, levelMin) "
-		            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-			preparedStatement.setString(1, ref.getName());
-			preparedStatement.setInt(2, ref.getSynchronizationRate());
-			preparedStatement.setInt(3, ref.getTacticalAbility());
-			preparedStatement.setInt(4, ref.getSupportAbility());
-			preparedStatement.setInt(5, ref.getDurationTime());
-			preparedStatement.setInt(6, ref.getExp());
-			preparedStatement.setInt(7, ref.getLevel());
-			preparedStatement.executeUpdate();
-		} catch (SQLException e) {
-            throw e;
-		}
+	public List<Simulation> retrieve(Session session) throws SQLException {
+		 String hql = "FROM Simulation";
+		 Query<Simulation> query = session.createQuery(hql, Simulation.class);
+		 return query.list();
 	}
 
-	@Override
-	public List<Simulation> retrieve(Connection connection) throws SQLException {
-	    List<Simulation> simulations = new ArrayList<>();
-	    String query = "SELECT * FROM simulation";
-	    try (PreparedStatement statement = connection.prepareStatement(query);
-	         ResultSet resultSet = statement.executeQuery()) {
-	        
-	        while (resultSet.next()) {
-	            String name = resultSet.getString("name");
-	            int synchronizationRate = resultSet.getInt("synchronizationRate");
-	            int tacticalAbility = resultSet.getInt("tacticalAbility");
-	            int supportAbility = resultSet.getInt("supportAbility");
-	            int durationTime = resultSet.getInt("durationTime");
-	            int exp = resultSet.getInt("exp");
-	            int levelMin = resultSet.getInt("levelMin");
-	            int simulationId = resultSet.getInt("simulationId");
-	            
-	            Simulation simulation = new Simulation(exp, levelMin, synchronizationRate, tacticalAbility,
-	            		supportAbility, name, durationTime, simulationId);
-	            
-	            simulations.add(simulation);
-	        }
-	    } catch (SQLException e) {
-	        logger.error("Error retrieving simulations: " + e.getMessage());
-	        throw e;
-	    }
-	    return simulations;
+	public Simulation retrieveBySimulationId(int simulationId, Session session) throws SQLException {
+	    String hql = "FROM Simulation s WHERE s.simulationId = :simulationId";
+	    Query<Simulation> query = session.createQuery(hql, Simulation.class);
+	    query.setParameter("simulationId", simulationId);
+	    
+	    return query.uniqueResult();
 	}
 	
-	public Simulation getSimulationById(int simulationId, Connection connection) throws SQLException {
-	    String simulationQuery = "SELECT * FROM SIMULATION WHERE simulationId = ?";
-	    String participantsQuery = "SELECT sp.*, u.userId, sp.memberId FROM SIMULATION_PARTICIPANTS sp "
-                + "JOIN USERS u ON sp.userId = u.userId "
-                + "WHERE sp.simulationId = ?";
-
+	
+	public Simulation getSimulationById(int simulationId, Session session) throws SQLException {
 	    Simulation simulation = null;
-	    List<SimulationParticipant> participants = new ArrayList<>();
 
-	    try (PreparedStatement preparedStatement = connection.prepareStatement(simulationQuery)) {
-	        preparedStatement.setInt(1, simulationId);
-	        ResultSet rs = preparedStatement.executeQuery();
+	    try {
+	        String hql = "FROM Simulation s " +
+	                     "JOIN FETCH s.simulationParticipants sp " +
+	                     "WHERE s.simulationId = :simulationId";
 	        
-	        if (rs.next()) {
-	            Integer exp = rs.getInt("exp");
-	            Integer level = rs.getInt("levelMin");
-	            Integer synchronizationRate = rs.getInt("synchronizationRate");
-	            Integer tacticalAbility = rs.getInt("tacticalAbility");
-	            Integer supportAbility = rs.getInt("supportAbility");
-	            String name = rs.getString("name");
-	            Integer durationTime = rs.getInt("durationTime");
+	        Query<Simulation> query = session.createQuery(hql, Simulation.class);
+	        query.setParameter("simulationId", simulationId);
 
-	            simulation = new Simulation(exp, level, synchronizationRate, tacticalAbility, 
-	                                         supportAbility, name, durationTime, simulationId);
-	        }
-	    }
-
-	    if (simulation != null) {
-	        try (PreparedStatement preparedStatement = connection.prepareStatement(participantsQuery)) {
-	            preparedStatement.setInt(1, simulationId);
-	            ResultSet rs = preparedStatement.executeQuery();
-	            
-	            while (rs.next()) {
-	                Integer participantId = rs.getInt("participantId");
-	                Integer userId = rs.getInt("userId");
-	                Integer memberId = rs.getInt("memberId");
-
-	                SimulationParticipant participant = new SimulationParticipant(
-	                    participantId,
-	                    simulation,
-	                    userId,
-	                    memberId
-	                );
-	                participants.add(participant);
-	            }
-	        }
-	    }
-
-	    if (simulation != null) {
-	        simulation.setSimulationParticipants(participants);
+	        simulation = query.uniqueResult();
+	    } catch (HibernateException e) {
+	        logger.error("Error retrieving simulation: " + simulationId + e.getMessage());
+	        throw new SQLException("Error retrieving simulation by id", e);
 	    }
 
 	    return simulation;
 	}
-	
-	
-	
-	public List<Simulation> getSimulationAndParticipantsByUserId(int userId, Connection connection) throws SQLException {
-	    String simulationQuery = "SELECT s.* FROM SIMULATION s "
-	                             + "JOIN SIMULATION_PARTICIPANTS sp ON s.simulationId = sp.simulationId "
-	                             + "WHERE sp.userId = ?";
+
+	public List<Simulation> getSimulationAndParticipantsByUserId(User user, Session session) {
+	    String hqlSimulations = "FROM Simulation s " +
+	                            "JOIN FETCH s.simulationParticipants sp " +
+	                            "WHERE sp.user.id = :userId";
 	    
-	    String participantsQuery = "SELECT sp.*, u.userId, sp.memberId FROM SIMULATION_PARTICIPANTS sp "
-	                               + "JOIN USERS u ON sp.userId = u.userId "
-	                               + "WHERE sp.simulationId = ?"; 
+	    Query<Simulation> simulationQuery = session.createQuery(hqlSimulations, Simulation.class);
+	    simulationQuery.setParameter("userId", user.getIdUser());
 
-	    List<Simulation> simulations = new ArrayList<>();
+	    List<Simulation> simulations = simulationQuery.getResultList();
 
+	    for (Simulation simulation : simulations) {
+	        List<SimulationParticipant> participants = simulation.getSimulationParticipants();
 
-	    try (PreparedStatement preparedStatement = connection.prepareStatement(simulationQuery)) {
-	        preparedStatement.setInt(1, userId);
-	        ResultSet rs = preparedStatement.executeQuery();
+	        for (SimulationParticipant participant : participants) {
 
-	        while (rs.next()) {
-	            Integer simulationId = rs.getInt("simulationId");
-	            Integer exp = rs.getInt("exp");
-	            Integer level = rs.getInt("levelMin");
-	            Integer synchronizationRate = rs.getInt("synchronizationRate");
-	            Integer tacticalAbility = rs.getInt("tacticalAbility");
-	            Integer supportAbility = rs.getInt("supportAbility");
-	            String name = rs.getString("name");
-	            Integer durationTime = rs.getInt("durationTime");
+	            LocalDateTime startTime = participant.getStartTime();
+	            LocalDateTime endTime = participant.getEndTime();
 
-	            Simulation simulation = new Simulation(exp, level, synchronizationRate, tacticalAbility,
-	                                                   supportAbility, name, durationTime, simulationId);
-
-	            List<SimulationParticipant> participants = new ArrayList<>();
-	            try (PreparedStatement psParticipants = connection.prepareStatement(participantsQuery)) {
-	                psParticipants.setInt(1, simulationId);  
-	                ResultSet participantRs = psParticipants.executeQuery();
-
-	                while (participantRs.next()) {
-	                    Integer participantId = participantRs.getInt("participantId");
-	                    Integer userIdParticipant = participantRs.getInt("userId");
-	                    Integer memberId = participantRs.getInt("memberId");
-	                    Timestamp startTime =participantRs.getTimestamp("startTime");
-	                    Timestamp endTime =participantRs.getTimestamp("endTime");
-	                    
-	                    LocalDateTime localStartTime = startTime.toLocalDateTime();
-	                    LocalDateTime localEndTime = endTime.toLocalDateTime();
-
-	                    SimulationParticipant participant = new SimulationParticipant(
-	                        participantId, simulation, userIdParticipant, memberId, localStartTime, localEndTime
-	                    );
-	                    participants.add(participant);
-	                }
-	            }
-
-	            simulation.setSimulationParticipants(participants);
-	            simulations.add(simulation);
 	        }
 	    }
 

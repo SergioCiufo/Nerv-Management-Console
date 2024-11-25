@@ -1,8 +1,8 @@
 package com.company.nervManagementConsole.service;
 
-import java.sql.Connection;
+import org.hibernate.Session;
 
-import com.company.nervManagementConsole.config.DatabaseConfig;
+import com.company.nervManagementConsole.config.HibernateUtil;
 import com.company.nervManagementConsole.dao.UserDao;
 import com.company.nervManagementConsole.exception.InvalidCredentialsException;
 import com.company.nervManagementConsole.model.User;
@@ -19,13 +19,12 @@ public class LoginService {
 	
 	public User loginCheck(String username, String password) throws Exception {
 		User user = null;
-		try (Connection connection = DatabaseConfig.getConnection()) {
-			user = userDao.getUserByUsernameAndPassword(username, password, connection);
-
+		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+			user = userDao.getUserByUsernameAndPassword(username, password, session);
 			if (user == null) {
 				throw new InvalidCredentialsException("Invalid Credentials", null);
 			}
-			user=ris.retriveUserInformation(user, connection);
+			user=ris.retriveUserInformation(user, session);
 			return user;
 		} 
 	}

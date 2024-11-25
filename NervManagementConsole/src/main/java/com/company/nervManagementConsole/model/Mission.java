@@ -11,6 +11,11 @@ public class Mission extends Activity {
 	private Integer participantsMax;
 	private List<MissionParticipants> missionParticipants;
 	
+	
+
+	public Mission() {
+		super();
+	}
 
 	public Mission(Integer exp, Integer level, Integer synchronizationRate, Integer tacticalAbility,
 			Integer supportAbility, String name, Integer durationTime, Integer missionId, String description,

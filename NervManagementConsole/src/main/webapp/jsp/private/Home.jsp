@@ -62,7 +62,7 @@ body {
 	MissionArchive missionArchive;
 	String status;
 	
-	List<SimulationParticipant> participants = user.getParticipants(); 
+	List<SimulationParticipant> simParticipants = user.getParticipants(); 
 	List<Member> members = user.getMembers();
 	Map<String, List<MissionArchive>> missionArchiveMap = user.getMissionArchiveResult();
 %>
@@ -123,15 +123,16 @@ body {
                         if (memberStats != null) {
                             status = memberStats.getStatus() ? "FREE" : "BUSY";
                             
-                            for (SimulationParticipant participant : participants) {
-                                if (participant.getMemberId().equals(member.getIdMember())) {
-                                    status = "TRAINING";
+                            for (SimulationParticipant participant : simParticipants) {
+                                if (participant.getMember().getIdMember().equals(member.getIdMember())) {
+                                    
+                                	status = "TRAINING";
                                     break;
                                 }
                             }
                             
                             for (MissionParticipants missPartecipant : user.getMissionParticipants()){
-                            	if(missPartecipant.getMemberId().equals(member.getIdMember())){
+                            	if (missPartecipant.getMember().getIdMember().equals(member.getIdMember())) {
                             		status = "MISSION";
                             		break;
                             	}
@@ -178,8 +179,8 @@ body {
             	String missInfo = null;
 
             	
-            	for (SimulationParticipant participant : participants) {
-                    if (participant.getMemberId().equals(member.getIdMember())) {
+            	for (SimulationParticipant participant : simParticipants) {
+                    if (participant.getMember().getIdMember().equals(member.getIdMember())) {
                         status = "TRAINING";
                         simInfo = participant.getSimulation().getName();
 
@@ -188,7 +189,7 @@ body {
                 }
             	
             	 for (MissionParticipants missPartecipant : user.getMissionParticipants()){
-                 	if(missPartecipant.getMemberId().equals(member.getIdMember())){
+            		 if (missPartecipant.getMember().getIdMember().equals(member.getIdMember())) {
                  		status = "MISSION";
                  		missInfo = missPartecipant.getMission().getName();
                  		break;
@@ -281,11 +282,11 @@ body {
             boolean hasParticipant = false;
             String membNameSurname = null;
 
-            for (SimulationParticipant participant : participants) {
+            for (SimulationParticipant participant : simParticipants) {
                 if (participant.getSimulation().getSimulationId().equals(sim.getSimulationId())) {
                     hasParticipant = true;
                     for (Member memb : members) {
-                        if (memb.getIdMember().equals(participant.getMemberId())) {
+                        if (memb.getIdMember().equals(participant.getMember().getIdMember())) {
                             membNameSurname = memb.getName() + " " + memb.getSurname();
                             break;
                         }
@@ -310,7 +311,7 @@ body {
 					method="post">
 					<input type="hidden" name="simulationId"
 						value="<%= sim.getSimulationId() %>"> <input type="hidden"
-						name="memberSelect" value="<%= participant.getMemberId() %>">
+						name="memberSelect" value="<%= participant.getMember().getIdMember() %>">
 					<button type="submit" class="buttonSimCompleted">
 						<span class="SimDescpBtn">
 							<h3><%= sim.getName() %></h3>
@@ -602,12 +603,26 @@ body {
 								<input type="hidden" name="missionId"
 									value="<%= miss.getMissionId() %>">
 								<% 
-
+								boolean busyMembers = true;
+								boolean lowLevelMembers = true;
+								
 	                		    for(int i = 0; i < user.getMembers().size(); i++) {
 	                		        member = user.getMembers().get(i);
 	                		        memberStats = member.getMemberStats();
-
-
+   
+	            			        for (Member ms : user.getMembers()) {
+	                		            if (!Boolean.FALSE.equals(ms.getMemberStats().getStatus()) && busyMembers) {
+	                		                busyMembers = false;
+	                		                break;
+	                		            }
+	                		            if (miss.getLevel() <= ms.getMemberStats().getLevel() && lowLevelMembers) {
+	                		            	lowLevelMembers = false;
+	                		                break;
+	                		            }
+	                		        }
+	                		        
+	                		        
+	                		        
 	                		        if(memberStats != null && memberStats.getStatus() == true && memberStats.getLevel() >= miss.getLevel()){
 	                		    %>
 
@@ -660,6 +675,11 @@ body {
 								<% 
 	                		        }
 	                		    }
+	            			    if(lowLevelMembers || busyMembers){
+	            		        	%>
+	            		        	<h1 style="color: black;">No members available.</h1>
+	            		        	<%
+	            		        }
 	                		    // Fine del ciclo per i membri
 	                		    %>
 
@@ -748,7 +768,7 @@ body {
 
 		    			                        	for(Member memb : members){
 		    			                        	
-		    			                        		if(memb.getIdMember().equals(missPart.getMemberId())){
+		    			                        		if(memb.getIdMember().equals(missPart.getMember().getIdMember())){
 		    				                        		%>
 
 						<h4>
@@ -780,7 +800,8 @@ body {
                 }
                 
                 
-              ///se l'archivio Ã¨ vuoto o se la missione esiste ma non c'Ã¨ nell'archivio
+              ///se l'archivio è vuoto o se la missione esiste ma non c'è nell'archivio
+              
                 for(Mission miss : user.getMissions()){
                 	boolean found = false;
                     	for(MissionArchive mArc : user.getMissionArchive()){
@@ -901,9 +922,23 @@ body {
 									value="<%= miss.getMissionId() %>">
 								<% 
 
+				Boolean busyMembers=true;
+				Boolean lowLevelMembers=true;			
+				
 			    for(int i = 0; i < user.getMembers().size(); i++) {
 			        member = user.getMembers().get(i);
 			        memberStats = member.getMemberStats();
+			        
+			        for (Member ms : user.getMembers()) {
+    		            if (!Boolean.FALSE.equals(ms.getMemberStats().getStatus()) && busyMembers) {
+    		                busyMembers = false;
+    		                break;
+    		            }
+    		            if (miss.getLevel() <= ms.getMemberStats().getLevel() && lowLevelMembers) {
+    		            	lowLevelMembers = false;
+    		                break;
+    		            }
+    		        }
 			
 			        if(memberStats != null && memberStats.getStatus() == true && memberStats.getLevel() >= miss.getLevel()){
 			    %>
@@ -956,6 +991,11 @@ body {
 								<% 
 			        }
 			    }
+			    if(lowLevelMembers || busyMembers){
+		        	%>
+		        	<h1 style="color: black;">No members available.</h1>
+		        	<%
+		        }
 			    // Fine del ciclo per i membri
 			    %>
 
@@ -972,6 +1012,7 @@ body {
 								</div>
 
 								<div>
+
 									<button type="submit" class="btn btn-primary btn-lg"
 										style="padding: 10px 20px; border-radius: 10px;">
 										START</button>
@@ -1008,9 +1049,7 @@ body {
     Map<String, List<MissionArchive>> groupedMissionArchive = new HashMap<>();
     for (MissionArchive ma : user.getMissionArchive()) {
         String missionCode = ma.getMissionCode();
-        if (!groupedMissionArchive.containsKey(missionCode)) {
-            groupedMissionArchive.put(missionCode, new ArrayList<>());
-        }
+        groupedMissionArchive.putIfAbsent(missionCode, new ArrayList<>());
         groupedMissionArchive.get(missionCode).add(ma);
     }
 
@@ -1018,53 +1057,48 @@ body {
     for (Map.Entry<String, List<MissionArchive>> entry : groupedMissionArchive.entrySet()) {
         String missionCode = entry.getKey();
         List<MissionArchive> missionList = entry.getValue();
-        MissionArchive firstMission = missionList.get(0); 
 %>
 				<table class="table table-striped table-bordered"
-					style="width: 100%; text-align: center; border-collapse: collapse;">
-					<thead>
-						<tr>
-							<th>MISSION: <%= firstMission.getMission().getName() %></th>
-							<th>Member</th>
-							<th>TA</th>
-							<th>SR</th>
-							<th>SA</th>
-							<th>Date</th>
-							<th>Result</th>
-						</tr>
-					</thead>
-					<tbody>
-						<% 
-                   
-                    boolean isFirstRow = true;
-                    for (MissionArchive ma : missionList) {
-                        for (Member memb : members) {
-                            if (memb.getIdMember().equals(ma.getMemberId())) {
-                                if (isFirstRow) {
-                %>
-						<tr>
-							<td rowspan="<%= missionList.size() %>">CODE <br> <%= missionCode %></td>
-							<% 
-                                        isFirstRow = false;
-                                    }
-                %>
-							<td><%= memb.getName() %> <%= memb.getSurname() %></td>
-							<td><%= ma.getTacticalAbility() %></td>
-							<td><%= ma.getSynchRate() %></td>
-							<td><%= ma.getSupportAbility() %></td>
-							<td><%= ma.getStartTime().toLocalDate() %></td>
-							<td><%= ma.getResult() %></td>
-						</tr>
-						<% 
-                            }
-                        }
-                    }
-                %>
-					</tbody>
+				       style="width: 100%; text-align: center; border-collapse: collapse;">
+				    <thead>
+				        <tr>
+				            <th>CODE</th>
+				            <th>Member</th>
+				            <th>TA</th>
+				            <th>SR</th>
+				            <th>SA</th>
+				            <th>Date</th>
+				            <th>Result</th>
+				        </tr>
+				    </thead>
+				    <tbody>
+				        <%
+				            boolean isFirstRow = true;
+				            for (MissionArchive ma : missionList) {
+				                for (Member memb : user.getMembers()) {
+				                    if (memb.getIdMember().equals(ma.getMember().getIdMember())) {
+				        %>
+				        <tr>
+				            <% if (isFirstRow) { %>
+				            <td rowspan="<%= missionList.size() %>"><%= missionCode %></td>
+				            <% isFirstRow = false; } %>
+				            <td><%= memb.getName() %> <%= memb.getSurname() %></td>
+				            <td><%= ma.getTacticalAbility() %></td>
+				            <td><%= ma.getSynchRate() %></td>
+				            <td><%= ma.getSupportAbility() %></td>
+				            <td><%= ma.getStartTime().toLocalDate() %></td>
+				            <td><%= ma.getResult() %></td>
+				        </tr>
+				        <%
+				                    }
+				                }
+				            }
+				        %>
+				    </tbody>
 				</table>
 				<%
-    }
-%>
+				    }
+				%>
 			</div>
 		</div>
 

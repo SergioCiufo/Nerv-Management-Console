@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.Session;
+
 import com.company.nervManagementConsole.dao.MemberDao;
 import com.company.nervManagementConsole.dao.MissionArchiveDao;
 import com.company.nervManagementConsole.dao.MissionDao;
@@ -40,31 +42,32 @@ public class RetriveInformationService {
 		this.missionArchiveDao = new MissionArchiveDao();
 	}
 	
-	public User retriveUserInformation(User user, Connection connection) throws SQLException {
-			List<Member> memberList = memberDao.retrieve(connection);
-			List<Simulation> simulationList = simulationDao.retrieve(connection);
+	public User retriveUserInformation(User user, Session session) throws SQLException {
+			session.clear(); //non venivano aggiornate le informazioni "nuove" del db, si pulisce la cache
+			List<Member> memberList = memberDao.retrieve(session);
+			List<Simulation> simulationList = simulationDao.retrieve(session);
 
 			user.setMembers(memberList);
 			user.setSimulations(simulationList);
+			if(memberList != null) {
+				for (Member member : memberList) {
 
-			for (Member member : memberList) {
-
-				UserMembersStats stats = userMemberStatsDao.retrieveByUserAndMember(user, member, connection);
-				member.setMemberStats(stats);
+					UserMembersStats stats = userMemberStatsDao.retrieveByUserAndMember(user, member, session);
+					member.setMemberStats(stats);
+				}
+				user = retriveSimulationAndPartecipant(user, session);
+				user = recoverUserMemberMission(user, session);
+				user = recoverMemberStats(user, session);
 			}
-
-			user = retriveSimulationAndPartecipant(user, connection);
-			user = recoverUserMemberMission(user, connection);
-			user = recoverMemberStats(user, connection);
 
 			return user;
 	}
 	
-	public User retriveSimulationAndPartecipant(User user, Connection connection) throws SQLException {
+	public User retriveSimulationAndPartecipant(User user, Session session) throws SQLException {
 			if (user.getParticipants() == null) {
 				user.setParticipants(new ArrayList<>());
 			}
-			List<Simulation> simulations = simulationDao.getSimulationAndParticipantsByUserId(user.getIdUser(), connection);
+			List<Simulation> simulations = simulationDao.getSimulationAndParticipantsByUserId(user, session);
 
 			if (simulations != null && !simulations.isEmpty()) {
 				user.getParticipants().clear();
@@ -82,15 +85,15 @@ public class RetriveInformationService {
 			return user;
 	}
 	
-	public User recoverUserMemberMission(User user, Connection connection) throws SQLException {
-			List<Mission> mission = missionDao.retrieve(connection);
+	public User recoverUserMemberMission(User user, Session session) throws SQLException {
+			List<Mission> mission = missionDao.retrieve(session);
 			List<MissionArchive> missionArchive = new ArrayList<MissionArchive>();
 			List<MissionParticipants> allMissionParticipants = new ArrayList<>();
 			for(Mission m : mission) {
-				List<MissionParticipants> missionParticipants = missionParticipantsDao.getMissionParticipantsByUserIdAndMissionId(user, m, connection);		
+				List<MissionParticipants> missionParticipants = missionParticipantsDao.getMissionParticipantsByUserIdAndMissionId(user, m, session);		
 				allMissionParticipants.addAll(missionParticipants);	 
 				m.setMissionParticipants(missionParticipants);
-				List<MissionArchive> archives = missionArchiveDao.retriveByUserIdAndIdMission(user, m, connection);
+				List<MissionArchive> archives = missionArchiveDao.retriveByUserIdAndIdMission(user, m, session);
 				missionArchive.addAll(archives);	
 			}		
 			user.setMissionParticipants(allMissionParticipants);
@@ -128,10 +131,10 @@ public class RetriveInformationService {
 			return user;		
 	}
 	
-	public User recoverMemberStats(User user, Connection connection) throws SQLException{
+	public User recoverMemberStats(User user, Session session) throws SQLException{
 			UserMembersStats ums = null;
 			for(Member m : user.getMembers()) {
-				ums = userMemberStatsDao.retrieveByUserAndMemberId(user, m.getIdMember(), connection);
+				ums = userMemberStatsDao.retrieveByUserAndMemberId(user, m.getIdMember(), session);
 				m.setMemberStats(ums);
 			}
 			return user;

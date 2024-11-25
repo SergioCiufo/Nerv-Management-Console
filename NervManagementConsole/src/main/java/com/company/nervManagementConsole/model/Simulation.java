@@ -7,6 +7,12 @@ public class Simulation extends Activity {
 	private Integer simulationId;
 	private List<SimulationParticipant> simulationParticipants;
 	
+	
+	
+	public Simulation() {
+		super();
+	}
+
 	public Simulation(Integer exp, Integer level, Integer synchronizationRate, Integer tacticalAbility,
 			Integer supportAbility, String name, Integer durationTime) {
 		super(exp, level, synchronizationRate, tacticalAbility, supportAbility, name, durationTime);
@@ -33,6 +39,7 @@ public class Simulation extends Activity {
 	public void setSimulationParticipants(List<SimulationParticipant> simulationParticipants) {
 		this.simulationParticipants = simulationParticipants;
 	}
+	
 
 	@Override
 	public int hashCode() {

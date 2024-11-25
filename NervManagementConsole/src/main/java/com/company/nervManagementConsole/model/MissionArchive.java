@@ -7,33 +7,63 @@ public class MissionArchive {
     private Integer missionArchiveId;
     private String missionCode;
     private Mission mission;
-    private Integer userId;
-    private Integer memberId;
+    // per mappare
+    private User user;
+    private Member member;
+    //
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Integer tacticalAbility;
     private Integer synchRate;
     private Integer supportAbility;
     private MissionResult result;  
+    
+    
 
-    public MissionArchive(Integer missionArchiveId, String missionCode, Mission mission, Integer userId,
-            Integer memberId, LocalDateTime startTime, LocalDateTime endTime, Integer tacticalAbility,
-            Integer synchRate, Integer supportAbility, MissionResult result) {
-        super();
-        this.missionArchiveId = missionArchiveId;
-        this.missionCode = missionCode;
-        this.mission = mission;
-        this.userId = userId;
-        this.memberId = memberId;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.tacticalAbility = tacticalAbility;
-        this.synchRate = synchRate;
-        this.supportAbility = supportAbility;
-        this.result = result;  // Modificato il tipo di result
-    }
+    public MissionArchive() {
+		super();
+	}
 
-    // I getter e setter ora si riferiscono all'enum MissionResult
+	public MissionArchive(String missionCode, Mission mission, User user, Member member, LocalDateTime startTime,
+			LocalDateTime endTime, Integer tacticalAbility, Integer synchRate, Integer supportAbility,
+			MissionResult result) {
+		super();
+		this.missionCode = missionCode;
+		this.mission = mission;
+		this.user = user;
+		this.member = member;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.tacticalAbility = tacticalAbility;
+		this.synchRate = synchRate;
+		this.supportAbility = supportAbility;
+		this.result = result;
+	}
+
+
+
+
+    
+    
+    
+    //per mappatura
+    public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+	///////////////////////
+	// I getter e setter ora si riferiscono all'enum MissionResult
     public MissionResult getResult() {
         return result;
     }
@@ -64,22 +94,6 @@ public class MissionArchive {
 
     public void setMission(Mission mission) {
         this.mission = mission;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getMemberId() {
-        return memberId;
-    }
-
-    public void setMemberId(Integer memberId) {
-        this.memberId = memberId;
     }
 
     public LocalDateTime getStartTime() {
@@ -123,35 +137,34 @@ public class MissionArchive {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(endTime, memberId, mission, missionArchiveId, missionCode, result, startTime,
-                supportAbility, synchRate, tacticalAbility, userId);
-    }
+	public int hashCode() {
+		return Objects.hash(endTime, member, mission, missionArchiveId, missionCode, result, startTime, supportAbility,
+				synchRate, tacticalAbility, user);
+	}
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        MissionArchive other = (MissionArchive) obj;
-        return Objects.equals(endTime, other.endTime) && Objects.equals(memberId, other.memberId)
-                && Objects.equals(mission, other.mission) && Objects.equals(missionArchiveId, other.missionArchiveId)
-                && Objects.equals(missionCode, other.missionCode) && result == other.result
-                && Objects.equals(startTime, other.startTime) && Objects.equals(supportAbility, other.supportAbility)
-                && Objects.equals(synchRate, other.synchRate) && Objects.equals(tacticalAbility, other.tacticalAbility)
-                && Objects.equals(userId, other.userId);
-    }
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MissionArchive other = (MissionArchive) obj;
+		return Objects.equals(endTime, other.endTime) && Objects.equals(member, other.member)
+				&& Objects.equals(mission, other.mission) && Objects.equals(missionArchiveId, other.missionArchiveId)
+				&& Objects.equals(missionCode, other.missionCode) && result == other.result
+				&& Objects.equals(startTime, other.startTime) && Objects.equals(supportAbility, other.supportAbility)
+				&& Objects.equals(synchRate, other.synchRate) && Objects.equals(tacticalAbility, other.tacticalAbility)
+				&& Objects.equals(user, other.user);
+	}
 
     @Override
-    public String toString() {
-        return "MissionArchive [missionArchiveId=" + missionArchiveId + ", missionCode=" + missionCode + ", mission="
-                + mission + ", userId=" + userId + ", memberId=" + memberId + ", startTime=" + startTime + ", endTime="
-                + endTime + ", tacticalAbility=" + tacticalAbility + ", synchRate=" + synchRate + ", supportAbility="
-                + supportAbility + ", result=" + result + "]";
-    }
+	public String toString() {
+		return "MissionArchive [missionArchiveId=" + missionArchiveId + ", missionCode=" + missionCode + ", startTime="
+				+ startTime + ", endTime=" + endTime + ", tacticalAbility=" + tacticalAbility + ", synchRate="
+				+ synchRate + ", supportAbility=" + supportAbility + ", result=" + result + "]";
+	}
 
  
     public enum MissionResult {

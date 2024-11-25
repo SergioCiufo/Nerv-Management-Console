@@ -6,6 +6,12 @@ public abstract class Activity extends Stats {
 	protected String name;
 	protected Integer durationTime;
 	
+	
+	
+	public Activity() {
+		super();
+	}
+
 	public Activity(Integer exp, Integer level, Integer synchronizationRate, Integer tacticalAbility,
 			Integer supportAbility, String name, Integer durationTime) {
 		super(exp, level, synchronizationRate, tacticalAbility, supportAbility);

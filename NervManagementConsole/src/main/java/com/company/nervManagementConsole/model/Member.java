@@ -8,7 +8,7 @@ public class Member {
 	private String surname;
 	private String alias;
 	private UserMembersStats userMembersStats;
-	
+
 	public Member() {
 		super();
 	}

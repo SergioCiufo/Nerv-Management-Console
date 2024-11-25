@@ -8,6 +8,21 @@ public class UserMembersStats extends Stats implements Levelable {
 	private Member member;
 	private Boolean status;
 	
+	
+	
+	public UserMembersStats() {
+		super();
+	}
+
+
+
+	public UserMembersStats(Integer exp, Integer level, Integer synchronizationRate, Integer tacticalAbility,
+			Integer supportAbility) {
+		super(exp, level, synchronizationRate, tacticalAbility, supportAbility);
+	}
+
+
+
 	public UserMembersStats(Boolean status, Integer exp, Integer level, Integer synchronizationRate, Integer tacticalAbility,
 			Integer supportAbility) {
 		super(exp, level, synchronizationRate, tacticalAbility, supportAbility);

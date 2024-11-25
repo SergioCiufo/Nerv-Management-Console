@@ -1,13 +1,15 @@
 package com.company.nervManagementConsole.service;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.company.nervManagementConsole.config.DatabaseConfig;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import com.company.nervManagementConsole.config.HibernateUtil;
 import com.company.nervManagementConsole.dao.MissionArchiveDao;
 import com.company.nervManagementConsole.dao.MissionDao;
 import com.company.nervManagementConsole.dao.MissionParticipantsDao;
@@ -40,8 +42,9 @@ public class MissionService {
 	}
 	
 	public User sendMembersMission(User user,  String idMissionString, List<String> idMembersString) throws SQLException {
-		try (Connection connection = DatabaseConfig.getConnection()) {
-			connection.setAutoCommit(false);
+		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+			Transaction transaction = session.beginTransaction();
+			
 			List<Integer>idMembers = new ArrayList<Integer>();
 			if(idMembersString != null) {
 				int idMembPars=0;
@@ -53,24 +56,20 @@ public class MissionService {
 
 			int idMission = Integer.parseInt(idMissionString);
 			LocalDateTime startTime = LocalDateTime.now();
-			Mission mission = missionDao.getMissionById(idMission, connection);
-			int duration = missionDao.getMissionById(idMission, connection).getDurationTime();
+			Mission mission = missionDao.getMissionById(idMission, session);
+			int duration = mission.getDurationTime();
+			
 			LocalDateTime endTime = startTime.plusMinutes(duration);
-
-			//conversione per tipo nel db
-			Timestamp startTimestamp = Timestamp.valueOf(startTime);
-			Timestamp endTimestamp = Timestamp.valueOf(endTime);
 
 			Integer tactAbility =null;
 			Integer synchRate =null;
 			Integer suppAbility =null;
 
-			List<MissionArchive> missionArch = missionArchiveDao.retriveByUserIdAndIdMission(user, mission, connection);
+			List<MissionArchive> missionArch = missionArchiveDao.retriveByUserIdAndIdMission(user, mission, session);
 			String missionCode = MissionCodeGeneratorUtils.missionCodeGenerator(missionArch, idMission);
 
-			//MissionArchive missionArchive = missionArchiveDao.retriveByUserIdAndIdMissionResultProgress(user, mission, connection);
 			for (Member memb : user.getMembers()) {
-				memb.setMemberStats(userMemberStatsDao.retrieveByUserAndMemberId(user, memb.getIdMember(), connection));
+				memb.setMemberStats(userMemberStatsDao.retrieveByUserAndMemberId(user, memb.getIdMember(), session));
 
 				if (idMembers.contains(memb.getIdMember())) {
 					UserMembersStats stats = memb.getMemberStats();
@@ -78,58 +77,66 @@ public class MissionService {
 						tactAbility = stats.getTacticalAbility();
 						synchRate = stats.getSynchronizationRate();
 						suppAbility = stats.getSupportAbility();
-						missionArchiveDao.addMissionArchive(user, mission.getMissionId(), memb.getIdMember(), missionCode, 
-								startTimestamp, endTimestamp, tactAbility, synchRate, suppAbility, MissionResult.PROGRESS, connection);
-						missionParticipantsDao.startMission(user, memb.getIdMember(), idMission, connection);
-						userMemberStatsDao.updateMembStatsStartSim(user, memb.getIdMember(), connection);
+						MissionArchive missionArchive = new MissionArchive(missionCode, mission, user, memb, startTime,
+								endTime, suppAbility, synchRate, tactAbility, MissionResult.PROGRESS);
+						missionArchiveDao.addMissionArchive(missionArchive, session);
+						MissionParticipants missPartecipants = new MissionParticipants(mission, user, memb);
+						missionParticipantsDao.startMission(missPartecipants, session);
+						userMemberStatsDao.updateMembStatsStartSim(user, memb, session);
 					}
 				}
 			}
-			connection.commit();
-			user = ris.retriveUserInformation(user, connection);
+			transaction.commit();
+			user = ris.retriveUserInformation(user, session);
 			return user;
 		}
 	}
 	
 	public User completeMission(User user, String idMissionString) throws SQLException {
-		try (Connection connection = DatabaseConfig.getConnection()) {
-			connection.setAutoCommit(false);
+		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+			Transaction transaction = session.beginTransaction();
+			
 			int idMission = Integer.parseInt(idMissionString);
-			Mission mission = missionDao.getMissionById(idMission, connection);
-			MissionArchive missionArchive = missionArchiveDao.retriveByUserIdAndIdMissionResultProgress(user, mission, connection);
-			List<MissionParticipants> missionParticipants = missionParticipantsDao.getMissionParticipantsByUserIdAndMissionId(user, mission, connection);
-			mission.setMissionParticipants(missionParticipants);			
-			List<UserMembersStats> ums = userMemberStatsDao.getMemberStatsByUserId(user, connection);		
+			Mission mission = missionDao.getMissionById(idMission, session);
+			MissionArchive missionArchive = missionArchiveDao.retriveByUserIdAndIdMissionResultProgress(user, mission, session);
+			List<MissionParticipants> missionParticipants = missionParticipantsDao.getMissionParticipantsByUserIdAndMissionId(user, mission, session);
+			mission.setMissionParticipants(missionParticipants);
+			//for ums che fa add con metodo ritira by user e member id
+			List<UserMembersStats> ums= new ArrayList<UserMembersStats>();
+			for (MissionParticipants mp : missionParticipants) {
+				Integer memberId = mp.getMember().getIdMember();
+				UserMembersStats umStats = userMemberStatsDao.retrieveByUserAndMemberId(user, memberId, session);
+				ums.add(umStats);
+			}	
 			Boolean result = null;
 			result = missionResult(result, mission, idMission, ums);
 			Integer newExp =mission.getExp();
-			for(MissionParticipants miss : mission.getMissionParticipants()) {
-				if(miss.getMission().getMissionId().equals(idMission)) {		
+
+	
 					for (UserMembersStats uMemberStats : ums) {
-						if (uMemberStats.getMember().getIdMember().equals(miss.getMemberId())) {
+
 							if(result==true) {
 								uMemberStats=LevelUpUtils.levelUp(uMemberStats, newExp);
-								userMemberStatsDao.updateMembStatsCompletedMission(user, miss.getMemberId(),
-										uMemberStats.getExp(), uMemberStats.getLevel(), uMemberStats.getSupportAbility(),
-										uMemberStats.getSynchronizationRate(), uMemberStats.getTacticalAbility(), connection);
+								uMemberStats.setStatus(true);						
+								userMemberStatsDao.updateMembStatsCompletedMission(uMemberStats, session);	
 							}else {
-								userMemberStatsDao.updateMembStatsCompletedMission(user, miss.getMemberId(), uMemberStats.getExp(),
-										uMemberStats.getLevel(), uMemberStats.getSupportAbility(), uMemberStats.getSynchronizationRate(),
-										uMemberStats.getTacticalAbility(), connection);
+								uMemberStats.setStatus(true);
+								userMemberStatsDao.updateMembStatsCompletedMission(uMemberStats, session);	
 							}
-						}
+						
 					}
-				}
+				
 
-			}
+			
 			if (result) {
-				missionArchiveDao.updateMissionResult(missionArchive, MissionResult.WIN, connection);
+				missionArchiveDao.updateMissionResult(missionArchive, MissionResult.WIN, session);
 			}else {
-				missionArchiveDao.updateMissionResult(missionArchive, MissionResult.LOSE, connection);
+				missionArchiveDao.updateMissionResult(missionArchive, MissionResult.LOSE, session);
 			}
-			missionParticipantsDao.removeParticipant(user, mission.getMissionId(), connection);
-			connection.commit();
-			user=ris.retriveUserInformation(user, connection);
+			missionParticipantsDao.removeParticipant(user, mission, session);
+			transaction.commit();
+			user=ris.retriveUserInformation(user, session);
+			
 			return user;
 		}
 	}
@@ -143,7 +150,7 @@ public class MissionService {
 			if(miss.getMission().getMissionId().equals(idMission)) {
 
 				for (UserMembersStats uMemberStats : ums) {
-					if (uMemberStats.getMember().getIdMember().equals(miss.getMemberId())) {
+					if (uMemberStats.getMember().getIdMember().equals(miss.getMember().getIdMember())) {
 						Integer syncRate = uMemberStats.getSynchronizationRate();
 						Integer tactAbility = uMemberStats.getTacticalAbility();
 						Integer suppAbility = uMemberStats.getSupportAbility();
@@ -158,4 +165,5 @@ public class MissionService {
 		result=CalculateUtils.calculateWinLoseProbability(mission.getSynchronizationRate(), mission.getSupportAbility(), mission.getTacticalAbility(), syncRateToAvg, tactAbilityToAvg, suppAbilityToAvg);
 		return result;
 	}
+	
 }

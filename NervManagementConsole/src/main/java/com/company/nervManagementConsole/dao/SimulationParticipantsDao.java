@@ -1,99 +1,65 @@
 package com.company.nervManagementConsole.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
+import java.sql.SQLException;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.company.nervManagementConsole.model.Member;
+import com.company.nervManagementConsole.model.Simulation;
 import com.company.nervManagementConsole.model.SimulationParticipant;
 import com.company.nervManagementConsole.model.User;
 
-public class SimulationParticipantsDao implements DaoInterface<SimulationParticipant> {
 
+public class SimulationParticipantsDao implements DaoInterface<SimulationParticipant> {
+	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+	
 	public SimulationParticipantsDao() {
 		super();
 	}
 
-	@Override
-	public void create(SimulationParticipant ref, Connection connection) throws SQLException {
-        String sql = "INSERT INTO SIMULATION_PARTICIPANTS (simulationId, userId, memberId) VALUES (?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-        	preparedStatement.setInt(1, ref.getSimulationParticipantId());
-        	preparedStatement.setInt(2, ref.getUserId());
-        	preparedStatement.setInt(3, ref.getMemberId());
-        	preparedStatement.executeUpdate();
-        }
-    }
-	
-	public void createParticipant(User user, Integer memberId, Integer simulationId, Timestamp startTimestamp, 
-			Timestamp endTimestamp, Connection connection) throws SQLException {
-        String sql = "INSERT INTO SIMULATION_PARTICIPANTS (simulationId, userId, memberId, startTime, endTime) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-        	preparedStatement.setInt(1, simulationId);
-        	preparedStatement.setInt(2, user.getIdUser());
-        	preparedStatement.setInt(3, memberId);
-        	preparedStatement.setTimestamp(4, startTimestamp);
-        	preparedStatement.setTimestamp(5, endTimestamp);
-        	preparedStatement.executeUpdate();
-        }
-    }
-	
-	public List<SimulationParticipant> retriveByUserId(User user, Connection connection) throws SQLException{
-		List<SimulationParticipant> spList= new ArrayList<SimulationParticipant>();
-		String sql = "SELECT * FROM SIMULATION_PARTICIPANTS WHERE userId= ?";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-			preparedStatement.setInt(1, user.getIdUser());
-			try (ResultSet result = preparedStatement.executeQuery()) {
-				while(result.next()) {
-					Integer partecipantId = result.getInt("participantId");
-					Integer memberId = result.getInt("memberId");
-					Timestamp startTimeTs = result.getTimestamp("startTime"); //da convertire in localdate
-					Timestamp endTimeTs = result.getTimestamp("endTime");  //da convertire in localdate
-					//fare un metodo fuori dal dao
-					LocalDateTime startTime = startTimeTs.toLocalDateTime();
-					LocalDateTime endTime = endTimeTs.toLocalDateTime();
-					
-
-		            SimulationParticipant sp = new SimulationParticipant(partecipantId, user.getIdUser(), memberId, startTime, endTime);
-		            spList.add(sp);
-				}
-			}
-		}
-		return spList;
+	public void createParticipant(SimulationParticipant ref, Session session) throws SQLException {
+		try {
+	        session.save(ref);
+	    } catch (HibernateException e) {
+	        logger.error("Error adding simulationPartecipant: " + ref + e.getMessage());
+	        throw e;
+	    }
 	}
-	
-	public SimulationParticipant getParticipantbyUserAndMemberId(User user, Integer memberId, Connection connection) throws SQLException {
+
+	public SimulationParticipant getParticipantbyUserAndMemberId(User user, Member member, Session session) throws SQLException {
 		SimulationParticipant sp = null;
-		String sql ="SELECT * FROM SIMULATION_PARTICIPANTS WHERE userId = ? AND memberId = ?";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-			preparedStatement.setInt(1, user.getIdUser());
-			preparedStatement.setInt(2, memberId);
-			try (ResultSet result = preparedStatement.executeQuery()) {
-				 if (result.next()) {
-
-	                Integer partecipantId = result.getInt("participantId");
-					Timestamp startTimeTs = result.getTimestamp("startTime"); //da convertire in localdate
-					Timestamp endTimeTs = result.getTimestamp("endTime");  //da convertire in localdate
-					LocalDateTime startTime = startTimeTs.toLocalDateTime();
-					LocalDateTime endTime = endTimeTs.toLocalDateTime();
-					sp = new SimulationParticipant(partecipantId, user.getIdUser(), memberId, startTime, endTime);
-
-	            }
-	        }
+		try {
+			 String hql = "FROM SimulationParticipant sp WHERE sp.user.id = :userId AND sp.member.id = :memberId";
+			 Query<SimulationParticipant> query = session.createQuery(hql, SimulationParticipant.class);
+			 query.setParameter("userId", user.getIdUser());
+			 query.setParameter("memberId", member.getIdMember());
+			 
+			 sp = query.uniqueResult();
+		} catch (HibernateException e) {
+	        logger.error("Error retrieving Simulation Participant for userId: " + user.getIdUser() + " and memberId: " + member.getIdMember() + " ", e);
+	        throw new SQLException("Error retrieving participant", e);
 	    }
 	    return sp;
 	}
-	
-	public void removeParticipant(User user, Integer simulationId, Connection connection) throws SQLException {
-		String sql ="DELETE FROM SIMULATION_PARTICIPANTS WHERE userId = ? AND simulationId = ?";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			preparedStatement.setInt(1, user.getIdUser());
-			preparedStatement.setInt(2, simulationId);
-			preparedStatement.executeUpdate();
-		} 
+
+	public void removeParticipant(User user, Simulation simulation, Session session) throws SQLException {
+	    try {
+	        String hql = "DELETE FROM SimulationParticipant sp " +
+	                     "WHERE sp.user.id = :userId AND sp.simulation.id = :simulationId";
+
+	        Query<?> query = session.createQuery(hql);
+	        query.setParameter("userId", user.getIdUser());
+	        query.setParameter("simulationId", simulation.getSimulationId());
+
+	        query.executeUpdate();
+	    } catch (HibernateException e) {
+	        logger.error("Error removing participant for userId: " + user.getIdUser() + " simulationId: " + simulation.getSimulationId(), e);
+	        throw new SQLException("Error removing participant", e);
+	    }
 	}
 }

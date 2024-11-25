@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.company.nervManagementConsole.model.Member" table="MEMBERS">
+		<id name="idMember" column="memberId">
+        	<generator class="identity"/>
+    	</id>
+
+		<!-- Attributi della classe Member -->
+		<property name="name" column="NAME"/>
+	    <property name="surname" column="SURNAME"/>
+	    <property name="alias" column="ALIAS"/>
+	    
+	    
+
+	    <!-- 
+	    <many-to-one name="userMembersStats" class="UserMembersStats" column="id_member_stats" not-null="true"/>
+	     -->
+		
+		
+		
+</class>
+</hibernate-mapping>

@@ -6,50 +6,45 @@ import java.util.Objects;
 public class SimulationParticipant {
 	private Integer simulationParticipantId;
 	private Simulation simulation;
-	private Integer userId;
-	private Integer memberId;
+	private User user;
+	private Member member;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	
-	public SimulationParticipant(Integer simulationParticipantId, Integer userId, Integer memberId) {
+	
+	
+	public SimulationParticipant() {
 		super();
-		this.simulationParticipantId = simulationParticipantId;
-		this.userId = userId;
-		this.memberId = memberId;
 	}
 	
-	public SimulationParticipant(Integer simulationParticipantId, Integer userId,
-			Integer memberId, LocalDateTime startTime, LocalDateTime endTime) {
+	
+
+	public SimulationParticipant(Simulation simulation, User user, Member member, LocalDateTime startTime,
+			LocalDateTime endTime) {
 		super();
-		this.simulationParticipantId = simulationParticipantId;
-		this.userId = userId;
-		this.memberId = memberId;
+		this.simulation = simulation;
+		this.user = user;
+		this.member = member;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
-
 	
-	
-	public SimulationParticipant(Integer simulationParticipantId, Simulation simulation, Integer userId, Integer memberId) {
-		super();
-		this.simulationParticipantId = simulationParticipantId;
-		this.simulation = simulation;
-		this.userId = userId;
-		this.memberId = memberId;
+	public User getUser() {
+		return user;
 	}
 
-	public SimulationParticipant(Integer simulationParticipantId, Simulation simulation, Integer userId,
-			Integer memberId, LocalDateTime startTime, LocalDateTime endTime) {
-		super();
-		this.simulationParticipantId = simulationParticipantId;
-		this.simulation = simulation;
-		this.userId = userId;
-		this.memberId = memberId;
-		this.startTime = startTime;
-		this.endTime = endTime;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
+	public Member getMember() {
+		return member;
+	}
 
+	public void setMember(Member member) {
+		this.member = member;
+	}
+////////////////////////////////
 	public Integer getSimulationParticipantId() {
 		return simulationParticipantId;
 	}
@@ -67,26 +62,6 @@ public class SimulationParticipant {
 
 	public void setSimulation(Simulation simulation) {
 		this.simulation = simulation;
-	}
-
-
-	public Integer getUserId() {
-		return userId;
-	}
-
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
-
-
-	public Integer getMemberId() {
-		return memberId;
-	}
-
-
-	public void setMemberId(Integer memberId) {
-		this.memberId = memberId;
 	}
 	
 	public LocalDateTime getStartTime() {
@@ -111,7 +86,7 @@ public class SimulationParticipant {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(endTime, memberId, simulation, simulationParticipantId, startTime, userId);
+		return Objects.hash(endTime, member, simulation, simulationParticipantId, startTime, user);
 	}
 
 
@@ -124,17 +99,16 @@ public class SimulationParticipant {
 		if (getClass() != obj.getClass())
 			return false;
 		SimulationParticipant other = (SimulationParticipant) obj;
-		return Objects.equals(endTime, other.endTime) && Objects.equals(memberId, other.memberId)
+		return Objects.equals(endTime, other.endTime) && Objects.equals(member, other.member)
 				&& Objects.equals(simulation, other.simulation)
 				&& Objects.equals(simulationParticipantId, other.simulationParticipantId)
-				&& Objects.equals(startTime, other.startTime) && Objects.equals(userId, other.userId);
+				&& Objects.equals(startTime, other.startTime) && Objects.equals(user, other.user);
 	}
 
 
 	@Override
 	public String toString() {
-		return "SimulationParticipant [simulationParticipantId=" + simulationParticipantId + ", simulation="
-				+ simulation + ", userId=" + userId + ", memberId=" + memberId + ", startTime=" + startTime
+		return "SimulationParticipant [simulationParticipantId=" + simulationParticipantId + ", startTime=" + startTime
 				+ ", endTime=" + endTime + "]";
 	}
 

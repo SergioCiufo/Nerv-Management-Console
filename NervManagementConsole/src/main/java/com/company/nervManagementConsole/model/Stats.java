@@ -9,6 +9,12 @@ public abstract class Stats {
 	private Integer tacticalAbility;
 	private Integer supportAbility;
 	
+	
+	
+	public Stats() {
+		super();
+	}
+
 	public Stats(Integer exp, Integer level, Integer synchronizationRate, Integer tacticalAbility,
 			Integer supportAbility) {
 		super();
