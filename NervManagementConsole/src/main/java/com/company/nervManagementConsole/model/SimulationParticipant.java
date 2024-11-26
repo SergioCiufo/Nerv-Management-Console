@@ -44,7 +44,7 @@ public class SimulationParticipant {
 	public void setMember(Member member) {
 		this.member = member;
 	}
-////////////////////////////////
+
 	public Integer getSimulationParticipantId() {
 		return simulationParticipantId;
 	}

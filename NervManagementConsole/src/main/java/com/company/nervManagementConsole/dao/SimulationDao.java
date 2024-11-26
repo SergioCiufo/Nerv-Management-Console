@@ -1,7 +1,6 @@
 package com.company.nervManagementConsole.dao;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -11,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.company.nervManagementConsole.model.Simulation;
-import com.company.nervManagementConsole.model.SimulationParticipant;
 import com.company.nervManagementConsole.model.User;
 
 public class SimulationDao implements DaoInterface<Simulation> {
@@ -65,17 +63,6 @@ public class SimulationDao implements DaoInterface<Simulation> {
 	    simulationQuery.setParameter("userId", user.getIdUser());
 
 	    List<Simulation> simulations = simulationQuery.getResultList();
-
-	    for (Simulation simulation : simulations) {
-	        List<SimulationParticipant> participants = simulation.getSimulationParticipants();
-
-	        for (SimulationParticipant participant : participants) {
-
-	            LocalDateTime startTime = participant.getStartTime();
-	            LocalDateTime endTime = participant.getEndTime();
-
-	        }
-	    }
 
 	    return simulations;
 	}

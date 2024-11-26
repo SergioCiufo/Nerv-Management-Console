@@ -20,7 +20,6 @@
         <property name="supportAbility" column="supportAbility" not-null="true"/>
 
         <!-- Risultato missione -->
-
 		<property name="result" column="result">
 	    <type name="org.hibernate.type.EnumType">
 		    <param name="enumClass">com.company.nervManagementConsole.model.MissionArchive$MissionResult</param>

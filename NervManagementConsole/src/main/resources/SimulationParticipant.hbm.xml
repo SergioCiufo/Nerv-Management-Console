@@ -13,19 +13,9 @@
         
         <!-- Relazione molti a uno con Member -->
         <many-to-one name="member" column="memberId" class="com.company.nervManagementConsole.model.Member" not-null="true"/>
-        
-        
+
         <property name="startTime" column="startTime"/>
         <property name="endTime" column="endTime"/>
-         
-        <!-- Costrizione unica per userId e memberId -->
-        <!--  da errore
-            <unique-key name="unique_user_member">
-            <column name="userId"/>
-            <column name="memberId"/>
-        </unique-key>
-        
-         -->
 
     </class>
 </hibernate-mapping>

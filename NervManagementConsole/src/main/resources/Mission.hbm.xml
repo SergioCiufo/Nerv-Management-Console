@@ -17,13 +17,6 @@
         <property name="supportAbility" column="supportAbility" not-null="true"/>
         <property name="exp" column="exp" not-null="true"/>
         <property name="durationTime" column="durationTime" not-null="true"/>
-		
-		<!-- 
-		        <one-to-many name="missionParticipants" class="MissionParticipants">
-            <key column="missionId"/>
-        </one-to-many>
-		 -->
-       
 
     </class>
 </hibernate-mapping>

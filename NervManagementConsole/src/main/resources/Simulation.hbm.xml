@@ -11,7 +11,7 @@
 		<property name="tacticalAbility" column="tacticalAbility"/>
         <property name="supportAbility" column="supportAbility"/>
         <property name="exp" column="exp"/>
-        <property name="level" column="levelMin"/> <!-- sta dando problemi -->
+        <property name="level" column="levelMin"/>
         <property name="durationTime" column="durationTime"/>
 
         

@@ -11,14 +11,6 @@
 		<property name="name" column="NAME"/>
 	    <property name="surname" column="SURNAME"/>
 	    <property name="alias" column="ALIAS"/>
-	    
-	    
-
-	    <!-- 
-	    <many-to-one name="userMembersStats" class="UserMembersStats" column="id_member_stats" not-null="true"/>
-	     -->
-		
-		
-		
+	
 </class>
 </hibernate-mapping>

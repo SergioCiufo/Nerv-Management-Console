@@ -5,10 +5,8 @@ import java.util.Objects;
 public class MissionParticipants {
 	private Integer missionParticipantsId;
 	private Mission mission;
-	//per mappare
 	private User user;
 	private Member member;
-	//
 	
 	public MissionParticipants() {
 		super();
@@ -22,9 +20,6 @@ public class MissionParticipants {
 		this.user = user;
 		this.member = member;
 	}
-
-	
-	//per mappare
 	
 	public User getUser() {
 		return user;
@@ -41,11 +36,6 @@ public class MissionParticipants {
 	public void setMember(Member member) {
 		this.member = member;
 	}
-	
-	//
-	
-	
-	
 
 	public Integer getMissionParticipantsId() {
 		return missionParticipantsId;

@@ -8,7 +8,7 @@
         <many-to-one name="user" column="userId" class="com.company.nervManagementConsole.model.User" />
         <many-to-one name="member" column="memberId" class="com.company.nervManagementConsole.model.Member" />
         
-        <!-- Attributi extra -->
+        <!-- Attributi -->
         <property name="level" column="levelPg"/>
         <property name="exp" column="exp"/>
         <property name="synchronizationRate" column="synchronizationRate"/>

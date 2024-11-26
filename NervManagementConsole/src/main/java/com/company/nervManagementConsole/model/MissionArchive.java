@@ -7,10 +7,8 @@ public class MissionArchive {
     private Integer missionArchiveId;
     private String missionCode;
     private Mission mission;
-    // per mappare
     private User user;
     private Member member;
-    //
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Integer tacticalAbility;
@@ -39,14 +37,7 @@ public class MissionArchive {
 		this.supportAbility = supportAbility;
 		this.result = result;
 	}
-
-
-
-
     
-    
-    
-    //per mappatura
     public User getUser() {
 		return user;
 	}
@@ -62,7 +53,7 @@ public class MissionArchive {
 	public void setMember(Member member) {
 		this.member = member;
 	}
-	///////////////////////
+	
 	// I getter e setter ora si riferiscono all'enum MissionResult
     public MissionResult getResult() {
         return result;
