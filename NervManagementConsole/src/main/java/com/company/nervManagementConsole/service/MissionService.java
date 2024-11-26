@@ -1,15 +1,12 @@
 package com.company.nervManagementConsole.service;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
-import com.company.nervManagementConsole.config.HibernateUtil;
+import com.company.nervManagementConsole.config.EntityManagerHandler;
+import com.company.nervManagementConsole.config.JpaUtil;
 import com.company.nervManagementConsole.dao.MissionArchiveDao;
 import com.company.nervManagementConsole.dao.MissionDao;
 import com.company.nervManagementConsole.dao.MissionParticipantsDao;
@@ -42,8 +39,8 @@ public class MissionService {
 	}
 	
 	public User sendMembersMission(User user,  String idMissionString, List<String> idMembersString) throws SQLException {
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			Transaction transaction = session.beginTransaction();
+		try(EntityManagerHandler entityManagerHandler = JpaUtil.getEntityManager()){
+			entityManagerHandler.beginTransaction();
 			
 			List<Integer>idMembers = new ArrayList<Integer>();
 			if(idMembersString != null) {
@@ -56,7 +53,7 @@ public class MissionService {
 
 			int idMission = Integer.parseInt(idMissionString);
 			LocalDateTime startTime = LocalDateTime.now();
-			Mission mission = missionDao.getMissionById(idMission, session);
+			Mission mission = missionDao.getMissionById(idMission, entityManagerHandler);
 			int duration = mission.getDurationTime();
 			
 			LocalDateTime endTime = startTime.plusMinutes(duration);
@@ -65,11 +62,11 @@ public class MissionService {
 			Integer synchRate =null;
 			Integer suppAbility =null;
 
-			List<MissionArchive> missionArch = missionArchiveDao.retriveByUserIdAndIdMission(user, mission, session);
+			List<MissionArchive> missionArch = missionArchiveDao.retriveByUserIdAndIdMission(user, mission, entityManagerHandler);
 			String missionCode = MissionCodeGeneratorUtils.missionCodeGenerator(missionArch, idMission);
 
 			for (Member memb : user.getMembers()) {
-				memb.setMemberStats(userMemberStatsDao.retrieveByUserAndMemberId(user, memb.getIdMember(), session));
+				memb.setMemberStats(userMemberStatsDao.retrieveByUserAndMemberId(user, memb.getIdMember(), entityManagerHandler));
 
 				if (idMembers.contains(memb.getIdMember())) {
 					UserMembersStats stats = memb.getMemberStats();
@@ -79,33 +76,33 @@ public class MissionService {
 						suppAbility = stats.getSupportAbility();
 						MissionArchive missionArchive = new MissionArchive(missionCode, mission, user, memb, startTime,
 								endTime, suppAbility, synchRate, tactAbility, MissionResult.PROGRESS);
-						missionArchiveDao.addMissionArchive(missionArchive, session);
+						missionArchiveDao.addMissionArchive(missionArchive, entityManagerHandler);
 						MissionParticipants missPartecipants = new MissionParticipants(mission, user, memb);
-						missionParticipantsDao.startMission(missPartecipants, session);
-						userMemberStatsDao.updateMembStatsStartSim(user, memb, session);
+						missionParticipantsDao.startMission(missPartecipants, entityManagerHandler);
+						userMemberStatsDao.updateMembStatsStartSim(user, memb, entityManagerHandler);
 					}
 				}
 			}
-			transaction.commit();
-			user = ris.retriveUserInformation(user, session);
+			entityManagerHandler.commitTransaction();
+			user = ris.retriveUserInformation(user, entityManagerHandler);
 			return user;
 		}
 	}
 	
 	public User completeMission(User user, String idMissionString) throws SQLException {
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			Transaction transaction = session.beginTransaction();
+		try(EntityManagerHandler entityManagerHandler = JpaUtil.getEntityManager()){
+			entityManagerHandler.beginTransaction();
 			
 			int idMission = Integer.parseInt(idMissionString);
-			Mission mission = missionDao.getMissionById(idMission, session);
-			MissionArchive missionArchive = missionArchiveDao.retriveByUserIdAndIdMissionResultProgress(user, mission, session);
-			List<MissionParticipants> missionParticipants = missionParticipantsDao.getMissionParticipantsByUserIdAndMissionId(user, mission, session);
+			Mission mission = missionDao.getMissionById(idMission, entityManagerHandler);
+			MissionArchive missionArchive = missionArchiveDao.retriveByUserIdAndIdMissionResultProgress(user, mission, entityManagerHandler);
+			List<MissionParticipants> missionParticipants = missionParticipantsDao.getMissionParticipantsByUserIdAndMissionId(user, mission, entityManagerHandler);
 			mission.setMissionParticipants(missionParticipants);
 			//for ums che fa add con metodo ritira by user e member id
 			List<UserMembersStats> ums= new ArrayList<UserMembersStats>();
 			for (MissionParticipants mp : missionParticipants) {
 				Integer memberId = mp.getMember().getIdMember();
-				UserMembersStats umStats = userMemberStatsDao.retrieveByUserAndMemberId(user, memberId, session);
+				UserMembersStats umStats = userMemberStatsDao.retrieveByUserAndMemberId(user, memberId, entityManagerHandler);
 				ums.add(umStats);
 			}	
 			Boolean result = null;
@@ -118,10 +115,10 @@ public class MissionService {
 							if(result==true) {
 								uMemberStats=LevelUpUtils.levelUp(uMemberStats, newExp);
 								uMemberStats.setStatus(true);						
-								userMemberStatsDao.updateMembStatsCompletedMission(uMemberStats, session);	
+								userMemberStatsDao.updateMembStatsCompletedMission(uMemberStats, entityManagerHandler);	
 							}else {
 								uMemberStats.setStatus(true);
-								userMemberStatsDao.updateMembStatsCompletedMission(uMemberStats, session);	
+								userMemberStatsDao.updateMembStatsCompletedMission(uMemberStats, entityManagerHandler);	
 							}
 						
 					}
@@ -129,13 +126,13 @@ public class MissionService {
 
 			
 			if (result) {
-				missionArchiveDao.updateMissionResult(missionArchive, MissionResult.WIN, session);
+				missionArchiveDao.updateMissionResult(missionArchive, MissionResult.WIN, entityManagerHandler);
 			}else {
-				missionArchiveDao.updateMissionResult(missionArchive, MissionResult.LOSE, session);
+				missionArchiveDao.updateMissionResult(missionArchive, MissionResult.LOSE, entityManagerHandler);
 			}
-			missionParticipantsDao.removeParticipant(user, mission, session);
-			transaction.commit();
-			user=ris.retriveUserInformation(user, session);
+			missionParticipantsDao.removeParticipant(user, mission, entityManagerHandler);
+			entityManagerHandler.commitTransaction();
+			user=ris.retriveUserInformation(user, entityManagerHandler);
 			
 			return user;
 		}

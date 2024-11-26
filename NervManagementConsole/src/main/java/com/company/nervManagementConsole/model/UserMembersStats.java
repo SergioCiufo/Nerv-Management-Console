@@ -2,10 +2,35 @@ package com.company.nervManagementConsole.model;
 
 import java.util.Objects;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@AttributeOverrides({
+    @AttributeOverride(name = "level", column = @Column(name = "levelPg"))
+})
+@Table(name = "USERMEMBERS_STATS")
 public class UserMembersStats extends Stats implements Levelable {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "idMemberStats")
 	private Integer idMemberStats;
+	
+	@ManyToOne
+	@JoinColumn(name = "userId")
 	private User user;
+	@ManyToOne
+	@JoinColumn(name = "memberId")
 	private Member member;
+	
 	private Boolean status;
 	
 	

@@ -2,13 +2,13 @@ package com.company.nervManagementConsole.dao;
 
 import java.sql.SQLException;
 
+import javax.persistence.NoResultException;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.company.nervManagementConsole.config.EntityManagerHandler;
 import com.company.nervManagementConsole.model.Member;
 import com.company.nervManagementConsole.model.User;
 import com.company.nervManagementConsole.model.UserMembersStats;
@@ -21,88 +21,90 @@ public class UserMemberStatsDao implements DaoInterface<UserMembersStats> {
 	}
 	
 	@Override
-	public void create(UserMembersStats ref, Session session) throws SQLException {
+	public void create(UserMembersStats ref, EntityManagerHandler entityManagerHandler) throws SQLException {
 	    try {
-	        session.save(ref);
+	    	entityManagerHandler.persist(ref);
 	    } catch (HibernateException e) {
 	        logger.error("Error adding member to user: " + ref.getUser().getIdUser() + e.getMessage());
 	        throw e;
 	    }
 	}
 
-	public UserMembersStats retrieveByUserAndMember(User user, Member member, Session session) {
-	    String hql = "FROM UserMembersStats ums WHERE ums.user.id = :userId AND ums.member.id = :memberId";
-	    Query<UserMembersStats> query = session.createQuery(hql, UserMembersStats.class);
-	    query.setParameter("userId", user.getIdUser());
-	    query.setParameter("memberId", member.getIdMember());
-
-	    UserMembersStats stats = null;
-	    try {
-	        stats = query.uniqueResult(); // Restituisce un solo risultato o null
+	public UserMembersStats retrieveByUserAndMember(User user, Member member, EntityManagerHandler entityManagerHandler)throws SQLException {
+		try {
+			return entityManagerHandler.getEntityManager()
+					.createQuery("FROM UserMembersStats ums WHERE ums.user.id = :userId AND ums.member.id = :memberId ", UserMembersStats.class)
+					.setParameter("userId", user.getIdUser())
+					.setParameter("memberId", member.getIdMember())
+					.getSingleResult();
+	    }catch (NoResultException e) {
+	        logger.error("No stats found with username: " + user.getIdUser() + " member " + member.getIdMember());
+	        return null;
 	    } catch (Exception e) {
 	        e.printStackTrace();
+	        throw new RuntimeException("Unexpected error during retrieval", e);
 	    }
-	    return stats;
 	}
 	
-    public UserMembersStats retrieveByUserAndMemberId(User user, Integer memberId, Session session) {
-        String hql = "FROM UserMembersStats ums WHERE ums.user.id = :userId AND ums.member.id = :memberId";
-        
-        Query<UserMembersStats> query = session.createQuery(hql, UserMembersStats.class);
-        query.setParameter("userId", user.getIdUser());
-        query.setParameter("memberId", memberId);
-        
-        UserMembersStats stats = query.uniqueResult();
-        
-        return stats;
+    public UserMembersStats retrieveByUserAndMemberId(User user, Integer memberId, EntityManagerHandler entityManagerHandler)throws SQLException  {
+		try {
+			return entityManagerHandler.getEntityManager()
+					.createQuery("FROM UserMembersStats ums "
+							+ "WHERE ums.user.id = :userId AND ums.member.id = :memberId ", UserMembersStats.class)
+					.setParameter("userId", user.getIdUser())
+					.setParameter("memberId", memberId)
+					.getSingleResult();
+	    }catch (NoResultException e) {
+	        logger.error("No stats found with username: " + user.getIdUser() + " member " + memberId);
+	        return null;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("Unexpected error during retrieval", e);
+	    }
     }
 
-    public void updateMembStatsStartSim (User user, Member member, Session session) throws SQLException {
+    public void updateMembStatsStartSim (User user, Member member, EntityManagerHandler entityManagerHandler) throws SQLException {
     	try {
-    		String hql = "UPDATE UserMembersStats ums " +
-                    "SET ums.status = :status " +
-                    "WHERE ums.user.id = :userId AND ums.member.id = :memberId";
-    		
-    		Query query = session.createQuery(hql);
-    		query.setParameter("status", false);
-    		query.setParameter("userId", user.getIdUser());
-    		query.setParameter("memberId", member.getIdMember());
-    		
-    		query.executeUpdate();
+    		entityManagerHandler.getEntityManager()
+    		.createQuery("UPDATE UserMembersStats ums "
+    				+ "SET ums.status = :status "
+    				+ "WHERE ums.user.id = :userId AND ums.member.id = :memberId")
+    		.setParameter("status", false)
+    		.setParameter("userId", user.getIdUser())
+    		.setParameter("memberId", member.getIdMember())
+    		.executeUpdate();
 		} catch (HibernateException e) {
 	        logger.error("Error updating member stats, idUser: " + user.getIdUser() + " memberId: " + member.getIdMember() + e.getMessage());
 	        throw new SQLException("Error updating member stats", e);
 		}
     }
     
-    public void updateMembStatsCompletedSim (User user, Member member, UserMembersStats ums, Session session) throws SQLException {
+    public void updateMembStatsCompletedSim (User user, Member member, UserMembersStats ums, EntityManagerHandler entityManagerHandler) throws SQLException {
     	try {
-    		String hql = "UPDATE UserMembersStats ums " +
-    				"SET ums.status = :status, ums.exp = :exp, ums.level = :levelPg, " +
+    		entityManagerHandler.getEntityManager()
+    		.createQuery("UPDATE UserMembersStats ums "
+    				+ "SET ums.status = :status, ums.exp = :exp, ums.level = :levelPg, " +
                     "ums.synchronizationRate = :sincRate, ums.tacticalAbility = :tactAbility, " +
-                    "ums.supportAbility = :suppAbility " +
-                    "WHERE ums.user.id = :userId AND ums.member.id = :memberId";
-    		
-    		Query query = session.createQuery(hql);
-    		query.setParameter("status", true);
-    		query.setParameter("exp", ums.getExp());
-    		query.setParameter("levelPg", ums.getLevel());
-    		query.setParameter("sincRate", ums.getSynchronizationRate());
-    		query.setParameter("tactAbility", ums.getTacticalAbility());
-    		query.setParameter("suppAbility", ums.getSupportAbility());
-    		query.setParameter("userId", user.getIdUser());
-    		query.setParameter("memberId", member.getIdMember());
-    		
-    		query.executeUpdate();
+                    "ums.supportAbility = :suppAbility "
+    				+ "WHERE ums.user.id = :userId AND ums.member.id = :memberId")
+    		.setParameter("status", true)
+    		.setParameter("exp", ums.getExp())
+    		.setParameter("levelPg", ums.getLevel())
+    		.setParameter("sincRate", ums.getSynchronizationRate())
+    		.setParameter("tactAbility", ums.getTacticalAbility())
+    		.setParameter("suppAbility", ums.getSupportAbility())
+    		.setParameter("userId", user.getIdUser())
+    		.setParameter("memberId", member.getIdMember())
+    		.executeUpdate();
 		} catch (HibernateException e) {
 	        logger.error("Error updating stats member, idUser: " + user.getIdUser() + " memberId: " + member.getIdMember() + e.getMessage());
 	        throw new SQLException("Error updating member stats", e);
 		}
     }
 
-    public void updateMembStatsCompletedMission(UserMembersStats uMemberStats, Session session) throws SQLException {
+    public void updateMembStatsCompletedMission(UserMembersStats uMemberStats, EntityManagerHandler entityManagerHandler) throws SQLException {
         try {
-            session.update(uMemberStats);
+            entityManagerHandler.getEntityManager().merge(uMemberStats);
         } catch (HibernateException e) {
         	logger.error("Error updating stats member, idUser: " + uMemberStats.getUser().getIdUser() + "memberid: " + uMemberStats.getMember().getIdMember() + e.getMessage());
 	        throw new SQLException("Error updating member stats", e);

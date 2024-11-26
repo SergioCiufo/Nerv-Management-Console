@@ -5,7 +5,8 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import com.company.nervManagementConsole.config.HibernateUtil;
+import com.company.nervManagementConsole.config.EntityManagerHandler;
+import com.company.nervManagementConsole.config.JpaUtil;
 import com.company.nervManagementConsole.dao.MemberDao;
 import com.company.nervManagementConsole.dao.UserDao;
 import com.company.nervManagementConsole.dao.UserMemberStatsDao;
@@ -33,24 +34,25 @@ public class RegisterService {
 	}
 	
 	public void register(String name, String surname, String username, String password) throws SQLException {
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			Transaction transaction = session.beginTransaction();
-			List<Member> defaultMembers = memberDao.retrieve(session);
+		try(EntityManagerHandler entityManagerHandler = JpaUtil.getEntityManager()){
+			entityManagerHandler.beginTransaction();
+			
+			List<Member> defaultMembers = memberDao.retrieve(entityManagerHandler);
 			User newUser = new User(name, surname, username, password, defaultMembers);
-			userDao.create(newUser, session);
-			newUser.setIdUser(userDao.getUserByUsername(newUser.getUsername(), session).getIdUser());
+			userDao.create(newUser, entityManagerHandler);
+			newUser.setIdUser(userDao.getUserByUsername(newUser.getUsername(), entityManagerHandler).getIdUser());
 
 			for (Member member : defaultMembers) {
 				if (member.getIdMember() != null) {
 					UserMembersStats stats = MemberStatsAddUtils.createStatsMembers(newUser, member);
-					userMemberStatsDao.create(stats, session);
+					userMemberStatsDao.create(stats, entityManagerHandler);
 					member.setMemberStats(stats);
 				} else {
 					logger.error("Member ID is null for: " + member.getIdMember() + member.getName() + member.getSurname());
 				}
 			}
 			newUser.setMembers(defaultMembers);
-			transaction.commit();
+			entityManagerHandler.commitTransaction();
 		}
 	}
 	

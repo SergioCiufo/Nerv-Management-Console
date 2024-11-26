@@ -3,19 +3,45 @@ package com.company.nervManagementConsole.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "MISSION_ARCHIVE")
 public class MissionArchive {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "missionArchiveId")
     private Integer missionArchiveId;
     private String missionCode;
+    
+    @ManyToOne
+    @JoinColumn(name = "missionId")
     private Mission mission;
-    // per mappare
+    
+    @ManyToOne
+    @JoinColumn(name = "userId")
     private User user;
+    
+    @ManyToOne
+    @JoinColumn(name = "memberId")
     private Member member;
-    //
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Integer tacticalAbility;
     private Integer synchRate;
     private Integer supportAbility;
+    
+    @Enumerated(EnumType.STRING)
     private MissionResult result;  
     
     
@@ -46,7 +72,7 @@ public class MissionArchive {
     
     
     
-    //per mappatura
+
     public User getUser() {
 		return user;
 	}
@@ -62,8 +88,7 @@ public class MissionArchive {
 	public void setMember(Member member) {
 		this.member = member;
 	}
-	///////////////////////
-	// I getter e setter ora si riferiscono all'enum MissionResult
+
     public MissionResult getResult() {
         return result;
     }

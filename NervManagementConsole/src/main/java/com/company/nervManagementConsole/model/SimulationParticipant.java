@@ -3,10 +3,33 @@ package com.company.nervManagementConsole.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "SIMULATION_PARTICIPANTS")
 public class SimulationParticipant {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "simulationParticipantId")
 	private Integer simulationParticipantId;
+	
+	@ManyToOne
+	@JoinColumn(name = "simulationId")
 	private Simulation simulation;
+	
+	@ManyToOne
+	@JoinColumn(name = "userId")
 	private User user;
+	
+	@ManyToOne
+	@JoinColumn(name = "memberId")
 	private Member member;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;

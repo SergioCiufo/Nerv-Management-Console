@@ -2,6 +2,9 @@ package com.company.nervManagementConsole.model;
 
 import java.util.Objects;
 
+import javax.persistence.MappedSuperclass;
+
+@MappedSuperclass
 public abstract class Activity extends Stats {
 	protected String name;
 	protected Integer durationTime;

@@ -1,14 +1,10 @@
 package com.company.nervManagementConsole.service;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
-import com.company.nervManagementConsole.config.HibernateUtil;
+import com.company.nervManagementConsole.config.EntityManagerHandler;
+import com.company.nervManagementConsole.config.JpaUtil;
 import com.company.nervManagementConsole.dao.MemberDao;
 import com.company.nervManagementConsole.dao.SimulationDao;
 import com.company.nervManagementConsole.dao.SimulationParticipantsDao;
@@ -38,47 +34,43 @@ public class SimulationService {
 	}
 	
 	public User sendMemberSimulation (User user, String idStringMember, String idStringSimulation) throws SQLException {
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			Transaction transaction = session.beginTransaction();
+		try(EntityManagerHandler entityManagerHandler = JpaUtil.getEntityManager()){
+			entityManagerHandler.beginTransaction();
 			
 			int idMember = Integer.parseInt(idStringMember);
-			Member member = memberDao.retrieveByMemberId(idMember, session);
+			Member member = memberDao.retrieveByMemberId(idMember, entityManagerHandler);
 			int idSimulation = Integer.parseInt(idStringSimulation);
-			Simulation simulation = simulationDao.retrieveBySimulationId(idSimulation, session);
+			Simulation simulation = simulationDao.retrieveBySimulationId(idSimulation, entityManagerHandler);
 			LocalDateTime startTime = LocalDateTime.now();
 
 			int duration = simulation.getDurationTime();
 
 			LocalDateTime endTime = startTime.plusMinutes(duration);
-
-			//conversione per tipo nel db
-			Timestamp startTimestamp = Timestamp.valueOf(startTime);
-			Timestamp endTimestamp = Timestamp.valueOf(endTime);
 			
-			userMemberStatsDao.updateMembStatsStartSim(user, member, session);
+			userMemberStatsDao.updateMembStatsStartSim(user, member, entityManagerHandler);
 			SimulationParticipant simParticipant = new SimulationParticipant(simulation, user, member, startTime, endTime);
-			simulationParticipantsDao.createParticipant(simParticipant, session);
-			transaction.commit();
-			user=ris.retriveUserInformation(user, session);
+			simulationParticipantsDao.createParticipant(simParticipant, entityManagerHandler);
+			entityManagerHandler.commitTransaction();
+			user=ris.retriveUserInformation(user, entityManagerHandler);
 			return user;
 		} 
 	}
 
 	public User completeSimulation (User user, String idStringMember, String idStringSimulation) throws SQLException {
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			Transaction transaction = session.beginTransaction();
+		try(EntityManagerHandler entityManagerHandler = JpaUtil.getEntityManager()){
+			entityManagerHandler.beginTransaction();
 			
 			SimulationParticipant simPart;
 			int idMember = Integer.parseInt(idStringMember);
-			Member member = memberDao.retrieveByMemberId(idMember, session);
+			Member member = memberDao.retrieveByMemberId(idMember, entityManagerHandler);
 			int idSimulation = Integer.parseInt(idStringSimulation);
-			Simulation simulation = simulationDao.retrieveBySimulationId(idSimulation, session);
+			Simulation simulation = simulationDao.retrieveBySimulationId(idSimulation, entityManagerHandler);
 			
-			simPart= simulationParticipantsDao.getParticipantbyUserAndMemberId(user, member, session);
+			simPart= simulationParticipantsDao.getParticipantbyUserAndMemberId(user, member, entityManagerHandler);
 			if(simPart.getEndTime().isBefore(LocalDateTime.now())) {
 
 				UserMembersStats ums;
-				ums= userMemberStatsDao.retrieveByUserAndMember(user, member, session);
+				ums= userMemberStatsDao.retrieveByUserAndMember(user, member, entityManagerHandler);
 
 				Integer suppAbility = simulation.getSupportAbility();
 				suppAbility = CalculateUtils.randomizeStats(suppAbility);
@@ -103,12 +95,12 @@ public class SimulationService {
 
 				ums=LevelUpUtils.levelUp(ums, newExp);
 
-				userMemberStatsDao.updateMembStatsCompletedSim(user, member, ums, session);
-				simulationParticipantsDao.removeParticipant(user, simulation, session);
+				userMemberStatsDao.updateMembStatsCompletedSim(user, member, ums, entityManagerHandler);
+				simulationParticipantsDao.removeParticipant(user, simulation, entityManagerHandler);
 
-				transaction.commit();
+				entityManagerHandler.commitTransaction();
 			}
-			user=ris.retriveUserInformation(user, session);
+			user=ris.retriveUserInformation(user, entityManagerHandler);
 			return user;
 		}
 	}

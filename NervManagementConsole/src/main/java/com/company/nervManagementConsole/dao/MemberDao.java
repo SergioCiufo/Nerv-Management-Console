@@ -2,11 +2,13 @@ package com.company.nervManagementConsole.dao;
 
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+import javax.persistence.NoResultException;
+
+import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.company.nervManagementConsole.config.EntityManagerHandler;
 import com.company.nervManagementConsole.model.Member;
 
 public class MemberDao implements DaoInterface<Member> {
@@ -16,39 +18,32 @@ public class MemberDao implements DaoInterface<Member> {
 		super();
 	}
 
-	public List<Member> retrieve(Session session) {
-	    List<Member> members = null;
-
+	public List<Member> retrieve(EntityManagerHandler entityManagerHandler) {
 	    try {
-	        String hql = "FROM Member ORDER BY memberId ASC";
-	        Query<Member> query = session.createQuery(hql, Member.class);
-
-	        members = query.getResultList();
-	        
-	    } catch (Exception e) {
+	    	return entityManagerHandler.getEntityManager()
+	    			.createQuery("FROM Member ORDER BY memberId ASC", Member.class)
+	    			.getResultList();
+	    	
+	    } catch (HibernateException e) {
 	        logger.error("Error retrieving members: " + e.getMessage());
 	        throw new RuntimeException("Unexpected error during retrieval", e);
 	    }
-
-	    return members;
 	}
 	
-	public Member retrieveByMemberId(Integer memberId, Session session) {
-	    Member member = null;
-
+	public Member retrieveByMemberId(Integer memberId, EntityManagerHandler entityManagerHandler) {
 	    try {
-	        String hql = "FROM Member m WHERE m.idMember = :memberId ";
-	        Query<Member> query = session.createQuery(hql, Member.class);
-	        query.setParameter("memberId", memberId);
-	        
-	        member = query.uniqueResult();
-	        
-	    } catch (Exception e) {
+	    	return entityManagerHandler.getEntityManager()
+	    			.createQuery("FROM Member m WHERE m.idMember = :memberId", Member.class)
+	    			.setParameter("memberId", memberId)
+	    			.getSingleResult();
+	    	
+	    }catch (NoResultException e) {
+	        logger.error("No member found with memberId: " + memberId);
+	        return null;
+	    } catch (HibernateException e) {
 	        logger.error("Error retrieving member: " + memberId + " " + e.getMessage());
 	        throw new RuntimeException("Unexpected error during retrieval", e);
 	    }
-
-	    return member;
 	}
 
 

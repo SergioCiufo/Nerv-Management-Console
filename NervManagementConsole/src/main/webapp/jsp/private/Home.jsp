@@ -939,7 +939,7 @@ body {
     		                break;
     		            }
     		        }
-			
+
 			        if(memberStats != null && memberStats.getStatus() == true && memberStats.getLevel() >= miss.getLevel()){
 			    %>
 

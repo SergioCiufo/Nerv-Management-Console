@@ -2,13 +2,34 @@ package com.company.nervManagementConsole.model;
 
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "MISSION_PARTICIPANTS")
 public class MissionParticipants {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "missionParticipantsId")
 	private Integer missionParticipantsId;
+	
+	@ManyToOne
+	@JoinColumn(name = "missionId")
 	private Mission mission;
-	//per mappare
+	
+	@ManyToOne
+	@JoinColumn(name = "userId")
 	private User user;
+	
+	@ManyToOne
+	@JoinColumn(name = "memberId")
 	private Member member;
-	//
 	
 	public MissionParticipants() {
 		super();
@@ -22,9 +43,6 @@ public class MissionParticipants {
 		this.user = user;
 		this.member = member;
 	}
-
-	
-	//per mappare
 	
 	public User getUser() {
 		return user;
@@ -41,11 +59,6 @@ public class MissionParticipants {
 	public void setMember(Member member) {
 		this.member = member;
 	}
-	
-	//
-	
-	
-	
 
 	public Integer getMissionParticipantsId() {
 		return missionParticipantsId;

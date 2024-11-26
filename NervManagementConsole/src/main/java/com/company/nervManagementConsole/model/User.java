@@ -5,20 +5,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name = "USERS")
 public class User {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "userId")
 	private Integer idUser;
 	private String name;
 	private String surname;
+	
+	@Column(unique = true, nullable = false)
 	private String username;
 	private String password;
 	
+	@Transient
 	private List<Member> members;
+	@Transient
 	private List<Simulation> simulations;
+	@Transient
 	private List<SimulationParticipant> participants;
+	@Transient
 	private List<Mission> missions;
+	@Transient
 	private List<MissionParticipants> missionParticipants;
+	@Transient
 	private List<MissionArchive> missionArchive;
-	
+	@Transient
 	private Map<String, List<MissionArchive>> missionArchiveResult;
 
 	public User() {

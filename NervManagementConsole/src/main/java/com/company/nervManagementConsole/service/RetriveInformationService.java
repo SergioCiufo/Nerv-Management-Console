@@ -1,6 +1,5 @@
 package com.company.nervManagementConsole.service;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -9,6 +8,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 
+import com.company.nervManagementConsole.config.EntityManagerHandler;
 import com.company.nervManagementConsole.dao.MemberDao;
 import com.company.nervManagementConsole.dao.MissionArchiveDao;
 import com.company.nervManagementConsole.dao.MissionDao;
@@ -42,32 +42,32 @@ public class RetriveInformationService {
 		this.missionArchiveDao = new MissionArchiveDao();
 	}
 	
-	public User retriveUserInformation(User user, Session session) throws SQLException {
-			session.clear(); //non venivano aggiornate le informazioni "nuove" del db, si pulisce la cache
-			List<Member> memberList = memberDao.retrieve(session);
-			List<Simulation> simulationList = simulationDao.retrieve(session);
+	public User retriveUserInformation(User user, EntityManagerHandler entityManagerHandler) throws SQLException {
+			entityManagerHandler.clear(); //non venivano aggiornate le informazioni "nuove" del db, si pulisce la cache
+			List<Member> memberList = memberDao.retrieve(entityManagerHandler);
+			List<Simulation> simulationList = simulationDao.retrieve(entityManagerHandler);
 
 			user.setMembers(memberList);
 			user.setSimulations(simulationList);
 			if(memberList != null) {
 				for (Member member : memberList) {
 
-					UserMembersStats stats = userMemberStatsDao.retrieveByUserAndMember(user, member, session);
+					UserMembersStats stats = userMemberStatsDao.retrieveByUserAndMember(user, member, entityManagerHandler);
 					member.setMemberStats(stats);
 				}
-				user = retriveSimulationAndPartecipant(user, session);
-				user = recoverUserMemberMission(user, session);
-				user = recoverMemberStats(user, session);
+				user = retriveSimulationAndPartecipant(user, entityManagerHandler);
+				user = recoverUserMemberMission(user, entityManagerHandler);
+				user = recoverMemberStats(user, entityManagerHandler);
 			}
 
 			return user;
 	}
 	
-	public User retriveSimulationAndPartecipant(User user, Session session) throws SQLException {
+	public User retriveSimulationAndPartecipant(User user, EntityManagerHandler entityManagerHandler) throws SQLException {
 			if (user.getParticipants() == null) {
 				user.setParticipants(new ArrayList<>());
 			}
-			List<Simulation> simulations = simulationDao.getSimulationAndParticipantsByUserId(user, session);
+			List<Simulation> simulations = simulationDao.getSimulationAndParticipantsByUserId(user, entityManagerHandler);
 
 			if (simulations != null && !simulations.isEmpty()) {
 				user.getParticipants().clear();
@@ -85,15 +85,15 @@ public class RetriveInformationService {
 			return user;
 	}
 	
-	public User recoverUserMemberMission(User user, Session session) throws SQLException {
-			List<Mission> mission = missionDao.retrieve(session);
+	public User recoverUserMemberMission(User user, EntityManagerHandler entityManagerHandler) throws SQLException {
+			List<Mission> mission = missionDao.retrieve(entityManagerHandler);
 			List<MissionArchive> missionArchive = new ArrayList<MissionArchive>();
 			List<MissionParticipants> allMissionParticipants = new ArrayList<>();
 			for(Mission m : mission) {
-				List<MissionParticipants> missionParticipants = missionParticipantsDao.getMissionParticipantsByUserIdAndMissionId(user, m, session);		
+				List<MissionParticipants> missionParticipants = missionParticipantsDao.getMissionParticipantsByUserIdAndMissionId(user, m, entityManagerHandler);		
 				allMissionParticipants.addAll(missionParticipants);	 
 				m.setMissionParticipants(missionParticipants);
-				List<MissionArchive> archives = missionArchiveDao.retriveByUserIdAndIdMission(user, m, session);
+				List<MissionArchive> archives = missionArchiveDao.retriveByUserIdAndIdMission(user, m, entityManagerHandler);
 				missionArchive.addAll(archives);	
 			}		
 			user.setMissionParticipants(allMissionParticipants);
@@ -131,10 +131,10 @@ public class RetriveInformationService {
 			return user;		
 	}
 	
-	public User recoverMemberStats(User user, Session session) throws SQLException{
+	public User recoverMemberStats(User user, EntityManagerHandler entityManagerHandler) throws SQLException{
 			UserMembersStats ums = null;
 			for(Member m : user.getMembers()) {
-				ums = userMemberStatsDao.retrieveByUserAndMemberId(user, m.getIdMember(), session);
+				ums = userMemberStatsDao.retrieveByUserAndMemberId(user, m.getIdMember(), entityManagerHandler);
 				m.setMemberStats(ums);
 			}
 			return user;

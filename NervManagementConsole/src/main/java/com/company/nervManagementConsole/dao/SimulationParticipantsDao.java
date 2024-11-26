@@ -3,12 +3,13 @@ package com.company.nervManagementConsole.dao;
 
 import java.sql.SQLException;
 
+import javax.persistence.NoResultException;
+
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.company.nervManagementConsole.config.EntityManagerHandler;
 import com.company.nervManagementConsole.model.Member;
 import com.company.nervManagementConsole.model.Simulation;
 import com.company.nervManagementConsole.model.SimulationParticipant;
@@ -22,44 +23,45 @@ public class SimulationParticipantsDao implements DaoInterface<SimulationPartici
 		super();
 	}
 
-	public void createParticipant(SimulationParticipant ref, Session session) throws SQLException {
+	public void createParticipant(SimulationParticipant ref, EntityManagerHandler entityManagerHandler) throws SQLException {
 		try {
-	        session.save(ref);
+			entityManagerHandler.persist(ref);
 	    } catch (HibernateException e) {
 	        logger.error("Error adding simulationPartecipant: " + ref + e.getMessage());
 	        throw e;
 	    }
 	}
 
-	public SimulationParticipant getParticipantbyUserAndMemberId(User user, Member member, Session session) throws SQLException {
-		SimulationParticipant sp = null;
+	public SimulationParticipant getParticipantbyUserAndMemberId(User user, Member member, EntityManagerHandler entityManagerHandler) throws SQLException {
 		try {
-			 String hql = "FROM SimulationParticipant sp WHERE sp.user.id = :userId AND sp.member.id = :memberId";
-			 Query<SimulationParticipant> query = session.createQuery(hql, SimulationParticipant.class);
-			 query.setParameter("userId", user.getIdUser());
-			 query.setParameter("memberId", member.getIdMember());
-			 
-			 sp = query.uniqueResult();
-		} catch (HibernateException e) {
-	        logger.error("Error retrieving Simulation Participant for userId: " + user.getIdUser() + " and memberId: " + member.getIdMember() + " ", e);
-	        throw new SQLException("Error retrieving participant", e);
+			 return entityManagerHandler.getEntityManager()
+					.createQuery("FROM SimulationParticipant sp "
+							+ "WHERE sp.user.id = :userId AND sp.member.id = :memberId", SimulationParticipant.class)
+					.setParameter("userId", user.getIdUser())
+					.setParameter("memberId", member.getIdMember())
+					.getSingleResult();
+		
+		}catch (NoResultException e) {
+	        logger.error("No participant found with id: " + user.getIdUser() + " member " + member.getIdMember() );
+	        return null;
+	    } catch (HibernateException e) {
+	        logger.error("Error retrieving participant for userId: " + user.getIdUser() + " memberid: " + member.getIdMember() + " " + e.getMessage());
+	        throw new RuntimeException("Error retrieving Simulation Participant for userId: " + user.getIdUser() + " and memberId: " + member.getIdMember() + " ", e);
 	    }
-	    return sp;
 	}
 
-	public void removeParticipant(User user, Simulation simulation, Session session) throws SQLException {
+	public void removeParticipant(User user, Simulation simulation, EntityManagerHandler entityManagerHandler) throws SQLException {
 	    try {
-	        String hql = "DELETE FROM SimulationParticipant sp " +
-	                     "WHERE sp.user.id = :userId AND sp.simulation.id = :simulationId";
-
-	        Query<?> query = session.createQuery(hql);
-	        query.setParameter("userId", user.getIdUser());
-	        query.setParameter("simulationId", simulation.getSimulationId());
-
-	        query.executeUpdate();
+	        entityManagerHandler.getEntityManager()
+	        .createQuery("DELETE FROM SimulationParticipant sp " +
+	                     "WHERE sp.user.id = :userId AND sp.simulation.id = :simulationId")
+	        .setParameter("userId", user.getIdUser())
+	        .setParameter("simulationId", simulation.getSimulationId())
+	        .executeUpdate();
 	    } catch (HibernateException e) {
 	        logger.error("Error removing participant for userId: " + user.getIdUser() + " simulationId: " + simulation.getSimulationId(), e);
 	        throw new SQLException("Error removing participant", e);
 	    }
 	}
+	
 }

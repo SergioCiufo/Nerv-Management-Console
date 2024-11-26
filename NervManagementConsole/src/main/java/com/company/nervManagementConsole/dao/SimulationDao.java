@@ -1,17 +1,16 @@
 package com.company.nervManagementConsole.dao;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.NoResultException;
+
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.company.nervManagementConsole.config.EntityManagerHandler;
 import com.company.nervManagementConsole.model.Simulation;
-import com.company.nervManagementConsole.model.SimulationParticipant;
 import com.company.nervManagementConsole.model.User;
 
 public class SimulationDao implements DaoInterface<Simulation> {
@@ -21,64 +20,56 @@ public class SimulationDao implements DaoInterface<Simulation> {
 		super();
 	}
 
-	public List<Simulation> retrieve(Session session) throws SQLException {
-		 String hql = "FROM Simulation";
-		 Query<Simulation> query = session.createQuery(hql, Simulation.class);
-		 return query.list();
+	public List<Simulation> retrieve(EntityManagerHandler entityManagerHandler) throws SQLException {
+		 return entityManagerHandler.getEntityManager()
+				    .createQuery("FROM Simulation", Simulation.class)
+				    .getResultList();
 	}
 
-	public Simulation retrieveBySimulationId(int simulationId, Session session) throws SQLException {
-	    String hql = "FROM Simulation s WHERE s.simulationId = :simulationId";
-	    Query<Simulation> query = session.createQuery(hql, Simulation.class);
-	    query.setParameter("simulationId", simulationId);
-	    
-	    return query.uniqueResult();
-	}
-	
-	
-	public Simulation getSimulationById(int simulationId, Session session) throws SQLException {
-	    Simulation simulation = null;
-
-	    try {
-	        String hql = "FROM Simulation s " +
-	                     "JOIN FETCH s.simulationParticipants sp " +
-	                     "WHERE s.simulationId = :simulationId";
-	        
-	        Query<Simulation> query = session.createQuery(hql, Simulation.class);
-	        query.setParameter("simulationId", simulationId);
-
-	        simulation = query.uniqueResult();
+	public Simulation retrieveBySimulationId(int simulationId, EntityManagerHandler entityManagerHandler) throws SQLException {
+		try {
+			return entityManagerHandler.getEntityManager()
+	    		.createQuery("FROM Simulation s WHERE s.simulationId = :simulationId", Simulation.class)
+	    		.setParameter("simulationId", simulationId)
+	    		.getSingleResult();
+		}catch (NoResultException e) {
+	        logger.error("No Simulation found with id: " + simulationId);
+	        return null;
 	    } catch (HibernateException e) {
-	        logger.error("Error retrieving simulation: " + simulationId + e.getMessage());
-	        throw new SQLException("Error retrieving simulation by id", e);
+	        logger.error("Error retrieving Simulation: " + simulationId + " " + e.getMessage());
+	        throw new RuntimeException("Unexpected error during retrieval", e);
 	    }
-
-	    return simulation;
+	    
+	}
+	
+	
+	public Simulation getSimulationById(int simulationId, EntityManagerHandler entityManagerHandler) throws SQLException {
+	    try {
+	        return entityManagerHandler.getEntityManager()
+	        		.createQuery("FROM Simulation s "
+	        				+ "JOIN FETCH s.simulationParticipants sp "
+	        				+ "WHERE s.simulationId = :simulationId", Simulation.class)
+	        		.setParameter("simulationId", simulationId)
+	        		.getSingleResult();
+	        		
+	    }catch (NoResultException e) {
+	        logger.error("No Simulation found with id: " + simulationId);
+	        return null;
+	    } catch (HibernateException e) {
+	        logger.error("Error retrieving Simulation: " + simulationId + " " + e.getMessage());
+	        throw new RuntimeException("Unexpected error during retrieval", e);
+	    }
 	}
 
-	public List<Simulation> getSimulationAndParticipantsByUserId(User user, Session session) {
-	    String hqlSimulations = "FROM Simulation s " +
-	                            "JOIN FETCH s.simulationParticipants sp " +
-	                            "WHERE sp.user.id = :userId";
-	    
-	    Query<Simulation> simulationQuery = session.createQuery(hqlSimulations, Simulation.class);
-	    simulationQuery.setParameter("userId", user.getIdUser());
-
-	    List<Simulation> simulations = simulationQuery.getResultList();
-
-	    for (Simulation simulation : simulations) {
-	        List<SimulationParticipant> participants = simulation.getSimulationParticipants();
-
-	        for (SimulationParticipant participant : participants) {
-
-	            LocalDateTime startTime = participant.getStartTime();
-	            LocalDateTime endTime = participant.getEndTime();
-
-	        }
-	    }
-
+	public List<Simulation> getSimulationAndParticipantsByUserId(User user, EntityManagerHandler entityManagerHandler) {
+		List<Simulation> simulations = entityManagerHandler.getEntityManager()
+        		.createQuery("FROM Simulation s " +
+                        "JOIN FETCH s.simulationParticipants sp " +
+                        "WHERE sp.user.id = :userId", Simulation.class)
+        		.setParameter("userId", user.getIdUser())
+        		.getResultList();
+		
 	    return simulations;
 	}
-
 
 }

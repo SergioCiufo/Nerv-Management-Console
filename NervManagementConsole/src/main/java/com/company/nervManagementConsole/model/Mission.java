@@ -4,11 +4,30 @@ import java.sql.Blob;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@AttributeOverrides({
+    @AttributeOverride(name = "level", column = @Column(name = "levelMin"))
+})
+@Table(name = "MISSION")
 public class Mission extends Activity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "missionId")
 	private Integer missionId;
 	private String description;
 	private Blob image;
 	private Integer participantsMax;
+	@Transient
 	private List<MissionParticipants> missionParticipants;
 	
 	
